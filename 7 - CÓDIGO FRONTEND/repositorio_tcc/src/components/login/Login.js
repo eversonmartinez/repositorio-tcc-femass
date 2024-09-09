@@ -1,8 +1,23 @@
 import React, { Component } from 'react'
-import logoFemass from './../assets/images/logo-femass.png';
-import logo from './../assets/images/Logo TCCFLOW.png';
+import logoFemass from './../../assets/images/logo-femass.png';
+import logo from './../../assets/images/Logo TCCFLOW.png';
 import './login.css';
-export default class Login extends Component {
+import { useNavigate } from 'react-router-dom';
+
+function withNavigate(Component) {
+  return (props) => {
+    const navigate = useNavigate();
+    return <Component {...props} navigate={navigate} />;
+  };
+}
+
+class Login extends Component {
+  
+  login = () => {
+    sessionStorage.setItem('isLogged', true);
+    this.props.navigate('/');
+  }
+  
   render() {
     return (
       <div className='container-fluid d-flex flex-column justify-content-between' style={{'min-height': '100vh'}}>
@@ -28,7 +43,7 @@ export default class Login extends Component {
               </div>
               <div className='mb-5 row justify-content-center'>
                 <div className='col-12 d-grid'>
-                  <button className='btn btn-custom'>Entrar no sistema</button>
+                  <button className='btn btn-custom' onClick={this.login}>Entrar no sistema</button>
                 </div>
               </div>
             </div>
@@ -43,3 +58,5 @@ export default class Login extends Component {
     )
   }
 }
+
+export default withNavigate(Login);
