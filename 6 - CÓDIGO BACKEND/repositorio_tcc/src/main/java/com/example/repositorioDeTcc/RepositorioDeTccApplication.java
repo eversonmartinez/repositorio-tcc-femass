@@ -1,13 +1,13 @@
-package br.edu.femass.repositorio_tcc_backend;
+package com.example.repositorioDeTcc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RepositorioTccBackendApplication {
+public class RepositorioDeTccApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RepositorioTccBackendApplication.class, args);
+		SpringApplication.run(RepositorioDeTccApplication.class, args);
 	}
 
 }

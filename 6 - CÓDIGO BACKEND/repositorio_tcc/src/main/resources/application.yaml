@@ -1,0 +1,16 @@
+security:
+  jwt:
+    token:
+      secret-key: security.jwt.token.secret=${JWT_SECRET:53cr37}
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      show-sql: false
+    open-in-view: false

@@ -1,10 +1,10 @@
-package br.edu.femass.repositorio_tcc_backend;
+package com.example.repositorioDeTcc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RepositorioTccBackendApplicationTests {
+class RepositorioDeTccApplicationTests {
 
 	@Test
 	void contextLoads() {
