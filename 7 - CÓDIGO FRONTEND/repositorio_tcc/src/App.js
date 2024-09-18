@@ -1,13 +1,23 @@
 import React from 'react';
 import './App.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Login from './components/login/Login.js'
+import Home from './components/home/Home.js'
+import FirstScreen from './components/firstScreen/FirstScreen.js';
 
 class App extends React.Component{
   
   render(){
     return (
-      <div> 
-        <h1>Olá, Femass!</h1>
-      </div>
+      <BrowserRouter>
+        <div className="container-fluid">
+          <Routes>
+            <Route exact path="/" element={<FirstScreen />}></Route>
+            <Route exact path="/home" element={<Home />}></Route>
+            <Route exact path="/login" element={<Login />}></Route>
+          </Routes>
+        </div>
+      </BrowserRouter>
     );
   }
 }
