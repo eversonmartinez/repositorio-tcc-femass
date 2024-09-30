@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS professorTCC (
+    id UUID PRIMARY KEY,
+    cpf VARCHAR(11) NOT NULL,
+    FOREIGN KEY (id) REFERENCES users(id)
+)
