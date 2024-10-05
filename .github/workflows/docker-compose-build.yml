@@ -85,7 +85,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.TOKEN }} 
 
       # Step 12: Upload release assets (the built JAR file)
       - name: Upload Release Asset
@@ -97,4 +97,4 @@ jobs:
           asset_name: "repositorioDeTcc.jar"
           asset_content_type: application/java-archive
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.TOKEN }} 
