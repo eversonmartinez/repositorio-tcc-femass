@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/tcc")
+@CrossOrigin
 public class TCCController {
 
     @Autowired

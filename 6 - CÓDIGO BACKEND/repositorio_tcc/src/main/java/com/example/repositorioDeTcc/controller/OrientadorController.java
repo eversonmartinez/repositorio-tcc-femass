@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/orientadores")
+@CrossOrigin
 public class OrientadorController {
 
     @Autowired
