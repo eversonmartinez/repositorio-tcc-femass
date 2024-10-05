@@ -1,8 +1,8 @@
 package com.example.repositorioDeTcc.controller;
 
-import com.example.repositorioDeTcc.dto.AlunoDTO;
-import com.example.repositorioDeTcc.dto.AlunoMinDTO;
-import com.example.repositorioDeTcc.service.AlunoService;
+import com.example.repositorioDeTcc.dto.OrientadorDTO;
+import com.example.repositorioDeTcc.dto.OrientadorMinDTO;
+import com.example.repositorioDeTcc.service.OrientadorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,37 +12,37 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/alunos")
+@RequestMapping(value = "/orientadores")
 @CrossOrigin
-public class AlunoController {
+public class OrientadorController {
 
     @Autowired
-    AlunoService service;
+    OrientadorService service;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<AlunoDTO> findById(@PathVariable UUID id){
-        AlunoDTO result = service.findById(id);
+    public ResponseEntity<OrientadorDTO> findById(@PathVariable UUID id){
+        OrientadorDTO result = service.findById(id);
         return ResponseEntity.ok().body(result);
     }
 
     @GetMapping
-    public ResponseEntity<List<AlunoMinDTO>> findAll(){
-        List<AlunoMinDTO> result = service.findAll();
+    public ResponseEntity<List<OrientadorMinDTO>> findAll(){
+        List<OrientadorMinDTO> result = service.findAll();
         return ResponseEntity.ok().body(result);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AlunoDTO> create(@RequestBody AlunoDTO aluno){
+    public ResponseEntity<OrientadorDTO> create(@RequestBody OrientadorDTO orientador){
 
-        aluno = service.insert(aluno);
-        return ResponseEntity.ok().body(aluno);
+        orientador = service.insert(orientador);
+        return ResponseEntity.ok().body(orientador);
     }
 
     @PutMapping(value = "/{id}" , produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AlunoDTO> update(@PathVariable UUID id, @RequestBody AlunoDTO aluno){
+    public ResponseEntity<OrientadorDTO> update(@PathVariable UUID id, @RequestBody OrientadorDTO orientador){
 
-        aluno = service.update(id, aluno);
-        return ResponseEntity.ok().body(aluno);
+        orientador = service.update(id, orientador);
+        return ResponseEntity.ok().body(orientador);
 
     }
 
