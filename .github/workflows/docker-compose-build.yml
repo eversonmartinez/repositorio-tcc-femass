@@ -85,20 +85,27 @@ jobs:
           echo "New version: $new_version"
           echo "RELEASE_VERSION=$new_version" >> $GITHUB_ENV
 
-      # Step 11: Create Release
+      # Step 11: Create Release only if it doesn't exist
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: "${{ env.RELEASE_VERSION }}"
-          release_name: "Release ${{ env.RELEASE_VERSION }}"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Usando o token correto
+        run: |
+          # Verificar se a tag já existe
+          if git tag | grep -q "${{ env.RELEASE_VERSION }}"; then
+            echo "Tag ${{ env.RELEASE_VERSION }} já existe. Nenhuma nova release será criada."
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "Criando nova release..."
+            echo "exists=false" >> $GITHUB_ENV
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"tag_name\":\"${{ env.RELEASE_VERSION }}\",\"name\":\"Release ${{ env.RELEASE_VERSION }}\",\"draft\":false,\"prerelease\":false}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases"
+          fi
 
-      # Step 12: Upload release assets (the built JAR file)
+      # Step 12: Upload release assets (the built JAR file) only if the release was created
       - name: Upload Release Asset
+        if: env.exists == 'false'
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
