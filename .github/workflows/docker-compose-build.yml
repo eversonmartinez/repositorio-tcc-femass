@@ -71,7 +71,6 @@ jobs:
       - name: Generate Random Release Version
         id: random_version
         run: |
-          # Gerar um número aleatório entre 1 e 1000
           RANDOM_VERSION=$(shuf -i 1-1000 -n 1)
           echo "Generated random version: v$RANDOM_VERSION"
           echo "RELEASE_VERSION=v$RANDOM_VERSION" >> $GITHUB_ENV
@@ -80,7 +79,6 @@ jobs:
       - name: Create Release
         id: create_release
         run: |
-          # Verificar se a tag já existe
           if git tag | grep -q "${{ env.RELEASE_VERSION }}"; then
             echo "Tag ${{ env.RELEASE_VERSION }} já existe. Nenhuma nova release será criada."
             echo "exists=true" >> $GITHUB_ENV
@@ -92,30 +90,29 @@ jobs:
               -d "{\"tag_name\":\"${{ env.RELEASE_VERSION }}\",\"name\":\"Release ${{ env.RELEASE_VERSION }}\",\"draft\":false,\"prerelease\":false}" \
               "https://api.github.com/repos/${{ github.repository }}/releases")
 
-            # Capturar upload_url
             upload_url=$(echo "$response" | jq -r '.upload_url' | sed -e "s/{?name,label}//")
             echo "Upload URL: $upload_url"
             echo "exists=false" >> $GITHUB_ENV
             echo "upload_url=$upload_url" >> $GITHUB_ENV
           fi
+
+      # Step 12: Upload Release Asset
+      - name: Upload Release Asset
+        if: env.exists == 'false'
+        run: |
+          echo "Verificando a existência do arquivo .jar..."
+          ls -l "./6 - CÓDIGO BACKEND/repositorio_tcc/target/"
           
-          # Step 12: Upload Release Asset
-          - name: Upload Release Asset
-            if: env.exists == 'false'
-            run: |
-              echo "Verificando a existência do arquivo .jar..."
-              ls -l "./6 - CÓDIGO BACKEND/repositorio_tcc/target/"
-              
-              if [ ! -f "./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" ]; then
-                echo "Arquivo .jar não encontrado. Abortando o upload."
-                exit 1
-              fi
+          if [ ! -f "./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" ]; then
+            echo "Arquivo .jar não encontrado. Abortando o upload."
+            exit 1
+          fi
           
-              echo "Uploading asset..."
-              response=$(curl -X POST \
-                -H "Authorization: token ${{ secrets.TOKEN }}" \
-                -H "Content-Type: application/java-archive" \
-                --data-binary @"./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" \
-                "${{ env.upload_url }}")
-          
-              echo "Response: $response"  # Mostra a resposta da API para diagnóstico
+          echo "Uploading asset..."
+          response=$(curl -X POST \
+            -H "Authorization: token ${{ secrets.TOKEN }}" \
+            -H "Content-Type: application/java-archive" \
+            --data-binary @"./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" \
+            "${{ env.upload_url }}")
+
+          echo "Response: $response"  # Mostra a resposta da API para diagnóstico
