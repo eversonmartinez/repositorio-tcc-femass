@@ -27,8 +27,6 @@ public class AlunoService {
     @Autowired
     AlunoMapper alunoMapper;
 
-    private static final Logger logger = Logger.getLogger(AlunoService.class.getName());
-
     @Transactional(readOnly = true)
     public AlunoDTO findById(UUID id){
         Optional<Aluno> obj = repository.findById(id);
