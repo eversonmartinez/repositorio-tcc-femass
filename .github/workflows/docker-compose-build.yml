@@ -39,7 +39,7 @@ jobs:
       # Step 6: Start Application and Database
       - name: Start Application and Database
         run: |
-          cd "6 - CÓDIGO BACKEND/repositorio_tcc"
+          cd "6 - CÓDIGO BACKEND"
           docker-compose up -d
       # Step 7: Wait for Database to be Ready
       - name: Wait for Database
