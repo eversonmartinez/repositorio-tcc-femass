@@ -81,10 +81,9 @@ jobs:
           patch=$(echo "$latest_tag" | cut -d. -f3)
           new_patch=$((patch + 1))
           new_version="$major.$minor.$new_patch"
-
+          
           echo "New version: $new_version"
           echo "RELEASE_VERSION=$new_version" >> $GITHUB_ENV
-          echo "exists=false" >> $GITHUB_ENV
 
       # Step 11: Create Release
       - name: Create Release
