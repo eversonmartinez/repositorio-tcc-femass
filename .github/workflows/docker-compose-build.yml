@@ -24,6 +24,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
+          
       # Step 4: Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v3
@@ -36,16 +37,19 @@ jobs:
         run: |
           cd "6 - CÓDIGO BACKEND/repositorio_tcc"
           docker build -t conecta-memory .
+          
       # Step 6: Start Application and Database
       - name: Start Application and Database
         run: |
           cd "6 - CÓDIGO BACKEND/repositorio_tcc"
           docker-compose up -d
+          
       # Step 7: Wait for Database to be Ready
       - name: Wait for Database
         run: |
           echo "Waiting for database to be ready..."
           sleep 30  # Ajuste o tempo conforme necessário
+          
       # Step 8: Run Maven Build inside the Maven Container
       - name: Build Java Project
         run: |
@@ -55,22 +59,40 @@ jobs:
             -w /app \
             maven:3-eclipse-temurin-22-alpine \
             mvn package -DskipTests
+
       # Step 9: Build and push Docker images using docker-compose
       - name: Build and push Docker images
         run: |
           cd "6 - CÓDIGO BACKEND/repositorio_tcc"
           docker-compose build
           docker-compose push
-          
-      # Step 10: Check if a release tag exists and increment the version
 
+      # Step 10: Check if a release tag exists and increment the version
+      - name: Check if release tag exists and increment version
+        id: check_release
+        run: |
+          git fetch --tags
+          latest_tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Latest tag: $latest_tag"
+
+          # Check if the tag already exists
+          if git rev-parse "$latest_tag" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            version=$(echo "$latest_tag" | awk -F. '{print $1 "." $2 "." $3+1}')
+            echo "New version: $version"
+            echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
+      # Step 11: Delete existing tag (if exists)
       - name: Delete existing tag
         if: env.exists == 'true'
         run: |
           git tag -d "${{ env.RELEASE_VERSION }}"
-          git push origin :refs/tags/${{ env.RELEASE_VERSION }}
+          git push origin :refs/tags/${{ env.RELEASE_VERSION }} || true
 
-      # Step 11: Create Release
+      # Step 12: Create Release
       - name: Create Release
         id: create_release
         if: env.exists == 'false'  # Só cria o release se ele não existir
@@ -83,7 +105,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
-      # Step 12: Upload release assets (the built JAR file)
+      # Step 13: Upload release assets (the built JAR file)
       - name: Upload Release Asset
         if: env.exists == 'false'
         uses: actions/upload-release-asset@v1
