@@ -3,7 +3,7 @@ name: Build, Push Docker Compose Application and Create Release
 on:
   push:
     branches:
-      - secretTeste
+      - main
   workflow_dispatch:
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
       # Step 6: Start Application and Database
       - name: Start Application and Database
         run: |
-          cd "6 - CÓDIGO BACKEND/repositorio_tcc"
+          cd "6 - CÓDIGO BACKEND"
           docker-compose up -d
 
       # Step 7: Wait for Database to be Ready
@@ -63,7 +63,7 @@ jobs:
       # Step 9: Build and push Docker images using docker-compose
       - name: Build and push Docker images
         run: |
-          cd "6 - CÓDIGO BACKEND/repositorio_tcc"
+          cd "6 - CÓDIGO BACKEND"
           docker-compose build
           docker-compose push
 
