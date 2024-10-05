@@ -64,24 +64,36 @@ jobs:
           
       # Step 10: Check if a release tag exists and increment the version
 
-      - name: Delete existing tag
-        if: env.exists == 'true'
+      - name: Check if release tag exists and increment version
+        id: check_release
         run: |
-          git tag -d "${{ env.RELEASE_VERSION }}"
-          git push origin :refs/tags/${{ env.RELEASE_VERSION }}
-            
-            # Step 11: Create Release
-            - name: Create Release
-              id: create_release
-              if: env.exists == 'false'  # Só cria o release se ele não existir
-              uses: actions/create-release@v1
-              with:
-                tag_name: "${{ env.RELEASE_VERSION }}"
-                release_name: "Release ${{ env.RELEASE_VERSION }}"
-                draft: false
-                prerelease: false
-              env:
-                GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          git fetch --tags
+          latest_tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Latest tag: $latest_tag"
+          
+          # Verificar se o release já existe no repositório
+          if git rev-parse "$latest_tag" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_ENV
+            echo "Release already exists, skipping creation."
+          else
+            version=$(echo "$latest_tag" | awk -F. '{print $1 "." $2 "." $3+1}')
+            echo "New version: $version"
+            echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+      
+      # Step 11: Create Release
+      - name: Create Release
+        id: create_release
+        if: env.exists == 'false'  # Só cria o release se ele não existir
+        uses: actions/create-release@v1
+        with:
+          tag_name: "${{ env.RELEASE_VERSION }}"
+          release_name: "Release ${{ env.RELEASE_VERSION }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
       # Step 12: Upload release assets (the built JAR file)
       - name: Upload Release Asset
