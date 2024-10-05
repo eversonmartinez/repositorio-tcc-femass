@@ -67,23 +67,14 @@ jobs:
           docker-compose build
           docker-compose push
 
-      # Step 10: Check if a release tag exists and increment version
-      - name: Check if release tag exists and increment version
-        id: check_release
+      # Step 10: Generate a random release version
+      - name: Generate Random Release Version
+        id: random_version
         run: |
-          git fetch --tags
-          latest_tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
-          echo "Latest tag: $latest_tag"
-          
-          # Incrementing version
-          major=$(echo "$latest_tag" | cut -d. -f1)
-          minor=$(echo "$latest_tag" | cut -d. -f2)
-          patch=$(echo "$latest_tag" | cut -d. -f3)
-          new_patch=$((patch + 1))
-          new_version="$major.$minor.$new_patch"
-          
-          echo "New version: $new_version"
-          echo "RELEASE_VERSION=$new_version" >> $GITHUB_ENV
+          # Gerar um número aleatório entre 1 e 1000
+          RANDOM_VERSION=$(shuf -i 1-1000 -n 1)
+          echo "Generated random version: v$RANDOM_VERSION"
+          echo "RELEASE_VERSION=v$RANDOM_VERSION" >> $GITHUB_ENV
 
       # Step 11: Create Release only if it doesn't exist
       - name: Create Release
