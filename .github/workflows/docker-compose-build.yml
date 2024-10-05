@@ -102,11 +102,10 @@ jobs:
       # Step 12: Upload release assets (the built JAR file) only if the release was created
       - name: Upload Release Asset
         if: env.exists == 'false'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ env.upload_url }}
-          asset_path: "./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar"  
-          asset_name: "repositorioDeTcc.jar"
-          asset_content_type: application/java-archive
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Usando o token correto
+        run: |
+          echo "Uploading asset..."
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.TOKEN }}" \
+            -H "Content-Type: application/java-archive" \
+            --data-binary @"./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" \
+            "${{ env.upload_url }}"
