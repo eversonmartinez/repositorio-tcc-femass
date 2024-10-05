@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          
+
       # Step 4: Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v3
@@ -37,19 +37,19 @@ jobs:
         run: |
           cd "6 - CÓDIGO BACKEND/repositorio_tcc"
           docker build -t conecta-memory .
-          
+
       # Step 6: Start Application and Database
       - name: Start Application and Database
         run: |
           cd "6 - CÓDIGO BACKEND/repositorio_tcc"
           docker-compose up -d
-          
+
       # Step 7: Wait for Database to be Ready
       - name: Wait for Database
         run: |
           echo "Waiting for database to be ready..."
           sleep 30  # Ajuste o tempo conforme necessário
-          
+
       # Step 8: Run Maven Build inside the Maven Container
       - name: Build Java Project
         run: |
@@ -101,4 +101,4 @@ jobs:
           asset_name: "repositorioDeTcc.jar"
           asset_content_type: application/java-archive
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
