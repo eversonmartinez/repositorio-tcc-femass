@@ -103,6 +103,13 @@ jobs:
       - name: Upload Release Asset
         if: env.exists == 'false'
         run: |
+          echo "Verifying the existence of the JAR file..."
+          ls -l "./6 - CÓDIGO BACKEND/repositorio_tcc/target/"
+          if [ ! -f "./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar" ]; then
+            echo "Arquivo .jar não encontrado. Abortando o upload."
+            exit 1
+          fi
+      
           echo "Uploading asset..."
           curl -X POST \
             -H "Authorization: token ${{ secrets.TOKEN }}" \
