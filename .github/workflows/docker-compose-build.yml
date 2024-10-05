@@ -91,8 +91,6 @@ jobs:
         run: |
           echo "Creating release for version $RELEASE_VERSION"
           gh release create "$RELEASE_VERSION" --title "Release $RELEASE_VERSION" --generate-notes
-        env:
-          GH_TOKEN: ${{ secrets.TOKEN }}
 
       # Step 12: Upload release assets (the built JAR file)
       - name: Upload Release Asset
