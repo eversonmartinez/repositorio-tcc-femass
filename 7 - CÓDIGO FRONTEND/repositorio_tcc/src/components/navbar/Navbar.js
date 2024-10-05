@@ -20,6 +20,15 @@ export default class Navbar extends Component {
                     <Link to="/home" className='nav-link active text-white' id="linkToHome">Início</Link>
                   </li>
                   <li className="nav-item">
+                    <Link to="/alunos" className='nav-link active' id="linkToHome">Alunos</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/orientadores" className='nav-link active' id="linkToHome">Orientadores</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/tcc" className='nav-link active' id="linkToHome">Trabalhos de Conclusão</Link>
+                  </li>
+                  <li className="nav-item">
                     <Link to="/home" className='nav-link active' id="linkToHome">Meu TCC</Link>
                   </li>
                 </ul>

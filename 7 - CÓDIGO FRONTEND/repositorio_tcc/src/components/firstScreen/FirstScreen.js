@@ -13,22 +13,22 @@ class FirstScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-        redirecting: false,
+            redirecting: false,
         };
     }
 
     componentDidMount() {
         // Verificar se o usuário já acessou anteriormente
-        const isLogged = sessionStorage.getItem('isLogged');
+        const isAuthenticated = sessionStorage.getItem('token');
         
         this.setState({ redirecting: true });
 
         setTimeout(() => {
-        if (isLogged) {
-            this.props.navigate('/home');
-        } else {
-            this.props.navigate('/login');
-        }
+            if (isAuthenticated) {
+                this.props.navigate('/home');
+            } else {
+                this.props.navigate('/login');
+            }
         }, 0);  // Adiciona um pequeno delay
     }
 
