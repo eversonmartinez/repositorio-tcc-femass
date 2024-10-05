@@ -95,12 +95,17 @@ jobs:
             echo "exists=true" >> $GITHUB_ENV
           else
             echo "Criando nova release..."
-            echo "exists=false" >> $GITHUB_ENV
-            curl -X POST \
+            response=$(curl -s -X POST \
               -H "Authorization: token ${{ secrets.TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               -d "{\"tag_name\":\"${{ env.RELEASE_VERSION }}\",\"name\":\"Release ${{ env.RELEASE_VERSION }}\",\"draft\":false,\"prerelease\":false}" \
-              "https://api.github.com/repos/${{ github.repository }}/releases"
+              "https://api.github.com/repos/${{ github.repository }}/releases")
+
+            # Capturar upload_url
+            upload_url=$(echo "$response" | jq -r '.upload_url' | sed -e "s/{?name,label}//")
+            echo "Upload URL: $upload_url"
+            echo "exists=false" >> $GITHUB_ENV
+            echo "upload_url=$upload_url" >> $GITHUB_ENV
           fi
 
       # Step 12: Upload release assets (the built JAR file) only if the release was created
@@ -108,7 +113,7 @@ jobs:
         if: env.exists == 'false'
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ env.upload_url }}
           asset_path: "./6 - CÓDIGO BACKEND/repositorio_tcc/target/repositorioDeTcc-0.0.1-SNAPSHOT.jar"  
           asset_name: "repositorioDeTcc.jar"
           asset_content_type: application/java-archive
