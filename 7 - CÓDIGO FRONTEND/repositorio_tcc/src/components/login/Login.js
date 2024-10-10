@@ -85,8 +85,6 @@ class Login extends Component {
   }
 
   validatePassword = () => {
-    console.error(this.state.password, this.state.confPassword);
-    console.error(this.state.password !== this.state.confPassword)
     if(this.state.password !== this.state.confPassword) {
       document.getElementById('passwordConfNewUser').setCustomValidity('As senhas não conferem');
     } else {
