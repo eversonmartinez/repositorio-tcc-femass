@@ -44,3 +44,8 @@ body{
 .bg-custom-blue{
   background-color: #2C3D8F;
 }
+
+label.required:after {
+  content: " *";
+  color: red;
+}
