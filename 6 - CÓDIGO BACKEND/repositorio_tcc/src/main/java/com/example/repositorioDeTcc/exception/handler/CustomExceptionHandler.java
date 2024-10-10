@@ -2,6 +2,7 @@ package com.example.repositorioDeTcc.exception.handler;
 
 import com.example.repositorioDeTcc.exception.ExceptionResponse;
 import com.example.repositorioDeTcc.exception.ResourceNotFoundException;
+import com.example.repositorioDeTcc.exception.TooManyArgumentsException;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,11 @@ public class CustomExceptionHandler{
     public final ResponseEntity<ExceptionResponse> EntityExistsException(Exception ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
 
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(TooManyArgumentsException.class)
+    public final ResponseEntity<ExceptionResponse> handleTooManyArgumentsException(TooManyArgumentsException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }
