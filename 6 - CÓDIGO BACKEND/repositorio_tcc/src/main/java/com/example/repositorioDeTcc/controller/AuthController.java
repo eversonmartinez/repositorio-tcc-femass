@@ -1,14 +1,16 @@
 package com.example.repositorioDeTcc.controller;
 
+import com.example.repositorioDeTcc.dto.ChangePasswordRequestDTO;
 import com.example.repositorioDeTcc.dto.LoginRequestDTO;
 import com.example.repositorioDeTcc.dto.RegisterUserDTO;
 import com.example.repositorioDeTcc.service.AuthService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @CrossOrigin
@@ -25,5 +27,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterUserDTO registerUserDTO){
         return authService.register(registerUserDTO);
+    }
+
+    @PatchMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal connectedUser){
+        authService.changePassword(request, connectedUser);
+        return ResponseEntity.accepted().build();
     }
 }
