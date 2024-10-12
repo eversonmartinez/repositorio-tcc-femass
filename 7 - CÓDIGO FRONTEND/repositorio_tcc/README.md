@@ -4,14 +4,15 @@
 Para rodar, é necessário ter uma versão recente do [node js](https://nodejs.org/pt) instalado em sua máquina
 
 ## Instalando dependências
-Ao rodar o projeto pela primeira vez, ou após dependência terem sidos adicionadas por outros, execute o comando:
-### `npm install`
+Ao rodar o projeto pela primeira vez, ou após dependência terem sidos adicionadas por outros, vá pelo terminal 
+até a pasta que se encontra o projeto frontend e execute o comando:
+### -> `npm install`
 
 ## Outros comandos
 
 Outros comandos úteis são
 
-### `npm start`
+### -> `npm start`
 
 Executa o app em modo desenvolvedor.\
 Abra [http://localhost:3000](http://localhost:3000) para visualizar no navegador.
