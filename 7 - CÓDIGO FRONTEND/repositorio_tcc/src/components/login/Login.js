@@ -80,9 +80,12 @@ class Login extends Component {
     };
 
     fetch(url, requestOptions)
-      .then((response) => ({data: response.json(), ok: response.ok}))
+      .then((response) => response.json().then((data) => ({
+        ok: response.ok,
+        data
+      })))
         .then(response => {
-          if (response.ok) {
+          if (response.ok && response.data.token) {
               // Armazene o token em localStorage ou sessionStorage
               sessionStorage.setItem('token', response.data.token);
               toast.success('Login realizado!', {
@@ -97,7 +100,7 @@ class Login extends Component {
               setTimeout(() => {
                 this.props.navigate('/');
               }, 1000);
-            } else {
+            } else if (!response.ok){
               toast.error('Login falhou. Verifique suas credenciais.', {
                 position: "top-right",
                 autoClose: 3000,
@@ -107,8 +110,18 @@ class Login extends Component {
                 draggable: true,
                 progress: undefined,
               });
-            }
-          })
+            } else if(!response.data.token) {
+              toast.error('Erro inesperado', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+          }
+        })
       .catch(e => { console.log(e) }) 
   }
 
