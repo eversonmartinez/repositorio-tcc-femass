@@ -1,9 +1,7 @@
 package com.example.repositorioDeTcc.service;
 
-import com.example.repositorioDeTcc.dto.ChangePasswordRequestDTO;
-import com.example.repositorioDeTcc.dto.LoginRequestDTO;
-import com.example.repositorioDeTcc.dto.LoginResponseDTO;
-import com.example.repositorioDeTcc.dto.RegisterUserDTO;
+import com.example.repositorioDeTcc.dto.*;
+import com.example.repositorioDeTcc.exception.MustChangePasswordException;
 import com.example.repositorioDeTcc.exception.TooManyArgumentsException;
 import com.example.repositorioDeTcc.model.Role;
 import com.example.repositorioDeTcc.model.User;
@@ -33,7 +31,8 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<LoginResponseDTO> login(LoginRequestDTO loginRequestDTO) {
+
+    public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO) {
 
         if (loginRequestDTO.email() != null && !loginRequestDTO.email().isEmpty() &&
                 loginRequestDTO.matricula() != null && !loginRequestDTO.matricula().isEmpty()) {
@@ -42,15 +41,16 @@ public class AuthService {
 
         try {
             Authentication auth;
+            User user;
             if (loginRequestDTO.email() != null && !loginRequestDTO.email().isEmpty()) {
                 UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
                         loginRequestDTO.email(), loginRequestDTO.password());
                 auth = authenticationManager.authenticate(usernamePassword);
-
+                user = (User) userRepository.findByEmail(loginRequestDTO.email());
             } else if (loginRequestDTO.matricula() != null && !loginRequestDTO.matricula().isEmpty()) {
                 UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
                         loginRequestDTO.matricula(), loginRequestDTO.password());
-                System.out.println(usernamePassword);
+                user = (User) userRepository.findByEmail(loginRequestDTO.matricula());
                 auth = authenticationManager.authenticate(usernamePassword);
 
 
@@ -58,22 +58,34 @@ public class AuthService {
                 return ResponseEntity.badRequest().body(new LoginResponseDTO("Email or Matricula must be provided."));
             }
             var token = tokenService.generateToken((User) auth.getPrincipal());
+            if (user.getMustChangePassword()){
+                //throw new MustChangePasswordException("Must change password.");
+            }
+
             return ResponseEntity.ok(new LoginResponseDTO(token));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponseDTO("Authentication failed: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginErroDTO("Authentication failed: " + e.getMessage()));
         }
     }
 
     public ResponseEntity<?> register(RegisterUserDTO registerUserDTO) {
         if(userRepository.findByEmail(registerUserDTO.email()) != null) return ResponseEntity.badRequest().body("Email já está em uso");
+        if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body("Matricula já existe");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerUserDTO.password());
-        User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.USER);
+        String role;
+        if (registerUserDTO.mustChangePassword()){
+            role = "TOCHANGE";
+        }else {
+            role = "USER";
+        }
+        User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.valueOf(role));
 
         userRepository.save(newUser);
+        var token = tokenService.generateToken(newUser);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
 
@@ -88,6 +100,8 @@ public class AuthService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setRole(Role.USER);
+        user.setMustChangePassword(false);
         userRepository.save(user);
 
     }

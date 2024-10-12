@@ -34,6 +34,8 @@ public class User implements Serializable, UserDetails {
 
     private Boolean enabled;
 
+    private Boolean mustChangePassword;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -44,12 +46,12 @@ public class User implements Serializable, UserDetails {
         this.password = password;
         this.role = role;
         this.enabled = true;
+        this.mustChangePassword = true;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role == Role.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return role.getAuthorities();
     }
 
     @Override
