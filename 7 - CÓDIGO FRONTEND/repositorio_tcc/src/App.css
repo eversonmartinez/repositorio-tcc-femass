@@ -52,3 +52,8 @@ body{
 .large-modal{
   width: 90%;
 }
+
+label.required:after {
+  content: " *";
+  color: red;
+}
