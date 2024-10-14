@@ -1,5 +1,6 @@
 package com.example.repositorioDeTcc.service;
 
+import com.example.repositorioDeTcc.dto.ChangePasswordRequestDTO;
 import com.example.repositorioDeTcc.dto.LoginRequestDTO;
 import com.example.repositorioDeTcc.dto.LoginResponseDTO;
 import com.example.repositorioDeTcc.dto.RegisterUserDTO;
@@ -14,7 +15,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class AuthService {
@@ -26,6 +30,8 @@ public class AuthService {
 
     @Autowired
     AuthenticationManager authenticationManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public ResponseEntity<LoginResponseDTO> login(LoginRequestDTO loginRequestDTO) {
 
@@ -68,5 +74,21 @@ public class AuthService {
         userRepository.save(newUser);
 
         return ResponseEntity.ok().build();
+    }
+
+
+    public void changePassword(ChangePasswordRequestDTO request, Principal connectedUser) {
+        var user = ((User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal());
+
+        if(!passwordEncoder.matches(request.currentPassword(), user.getPassword())){
+            throw new IllegalStateException("Wrong password");
+        };
+        if(!request.newPassword().equals(request.confirmPassword())){
+            throw new IllegalStateException("New passwords do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
     }
 }
