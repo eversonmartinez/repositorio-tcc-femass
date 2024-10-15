@@ -15,7 +15,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/tcc")
 @CrossOrigin
-@PreAuthorize("hasAnyRole('USER','ADMIN','MODERATOR')")
 public class TCCController {
 
     @Autowired

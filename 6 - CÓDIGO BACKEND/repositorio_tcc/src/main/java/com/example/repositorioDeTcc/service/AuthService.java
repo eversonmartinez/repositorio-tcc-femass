@@ -32,6 +32,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
 
+
     public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO) {
 
         if (loginRequestDTO.email() != null && !loginRequestDTO.email().isEmpty() &&
@@ -57,10 +58,8 @@ public class AuthService {
             } else {
                 return ResponseEntity.badRequest().body(new LoginResponseDTO("Email or Matricula must be provided."));
             }
-            var token = tokenService.generateToken((User) auth.getPrincipal());
-            if (user.getMustChangePassword()){
-                //throw new MustChangePasswordException("Must change password.");
-            }
+            var token = tokenService.generateToken(user);
+
 
             return ResponseEntity.ok(new LoginResponseDTO(token));
 
@@ -74,18 +73,12 @@ public class AuthService {
         if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body("Matricula já existe");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerUserDTO.password());
-        String role;
-        if (registerUserDTO.mustChangePassword()){
-            role = "TOCHANGE";
-        }else {
-            role = "USER";
-        }
+        String role = "USER";
         User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.valueOf(role));
 
         userRepository.save(newUser);
-        var token = tokenService.generateToken(newUser);
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok().build();
     }
 
 
@@ -100,7 +93,6 @@ public class AuthService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
-        user.setRole(Role.USER);
         user.setMustChangePassword(false);
         userRepository.save(user);
 
