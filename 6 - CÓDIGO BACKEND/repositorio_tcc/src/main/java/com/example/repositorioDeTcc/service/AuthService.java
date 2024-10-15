@@ -50,7 +50,7 @@ public class AuthService {
             } else if (loginRequestDTO.matricula() != null && !loginRequestDTO.matricula().isEmpty()) {
                 UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
                         loginRequestDTO.matricula(), loginRequestDTO.password());
-                user = (User) userRepository.findByEmail(loginRequestDTO.matricula());
+                user = (User) userRepository.findByMatricula(loginRequestDTO.matricula());
                 auth = authenticationManager.authenticate(usernamePassword);
 
 
