@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../navbar/Navbar';
 import '../../assets/css/tcc.css';
 import Select from 'react-select'
-import { isDisabled } from '@testing-library/user-event/dist/utils';
+import { Button, Modal } from 'react-bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToastContainer, toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';  // Import the CSS for default styles
 
 function withNavigate(Component) {
     return (props) => {
@@ -32,8 +35,12 @@ class TCC extends Component {
         selectedAluno: null,
         isOrientadorInvalid: false,
         selectedOrientador: null,
-        resumo: null,
-        tituloTcc: null
+        resumo: '',
+        tituloTcc: '',
+        showModalDeletion: false,
+        toDeletionItem: null,
+        showModalDeletion: false,
+        toViewItem: null
     }
 
     handleChange = (event) => {
@@ -86,7 +93,7 @@ class TCC extends Component {
             })
     }
 
-    fillOptionsProfessores = () => {
+    fillOptionsOrientadores = () => {
         const url = window.server + "/orientadores";
 
         const token = sessionStorage.getItem('token');
@@ -112,7 +119,7 @@ class TCC extends Component {
 
     beginInsertion = () => {
         this.fillOptionsAlunos();
-        this.fillOptionsProfessores();
+        this.fillOptionsOrientadores();
     }
 
     validateForm = () => {
@@ -129,11 +136,11 @@ class TCC extends Component {
 
     clearState = () => {
         this.setState({
-            tituloTcc: null,
+            tituloTcc: '',
             selectedAluno: null,
             selectedCurso: null,
             selectedOrientador: null,
-            resumo: null,
+            resumo: '',
         });
     }
 
@@ -148,9 +155,9 @@ class TCC extends Component {
 
         let data = {
             "titulo": this.state.tituloTcc,
-            "idAluno": this.state.selectedAluno,
-            "idOrientador": this.state.selectedOrientador,
-            "idCurso": this.state.selectedCurso
+            "idAluno": this.state.selectedAluno.value,
+            "idOrientador": this.state.selectedOrientador.value,
+            "idCurso": this.state.selectedCurso.value
         }
 
         if(this.state.resumo) {
@@ -165,9 +172,6 @@ class TCC extends Component {
             },
             body: JSON.stringify(data)
         };
-
-        console.error(JSON.stringify(data));
-
 
         fetch(url, requestOptions)
         .then(response => {
@@ -192,6 +196,134 @@ class TCC extends Component {
         });
     }
 
+    beginEdit = (institute) => {
+		this.clearState();
+		this.setState({ creating: false })
+		this.setState({ editing: true, id: institute.id, name: institute.name, acronym: institute.acronym })
+	}
+
+    beginDeletion = (tccs) => {
+        this.state.toDeleteItem = tccs;
+        this.setState({ showModalDeletion: true });
+	}
+
+    delete = () => {
+        const url = window.server + "/tcc/" + this.state.toDeleteItem.id;
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    this.fillList();
+                    this.setState({ showModalDeletion: false });
+                    toast.success('TCC excluído!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                }
+                else{
+                    toast.error('Não foi possível excluir', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                    console.error(response);
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            });
+    }
+
+    closeModal = (operationName) => {
+        this.clearState();
+        this.setState({ ['showModal' + operationName]: false, ['to' + operationName + 'Item']: null });
+    }
+
+    beginView = (tcc) => { 
+        const url = window.server + "/tcc/" + tcc.id;
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    return response.json();
+                } else{
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            }).then((data) => {
+                console.error(data);
+                this.setState({ toViewItem: data, showModalView: true });
+            })
+            .catch((error) => {
+                console.error('Erro:', error);
+            });
+    }
+
+    beginEdit = (tcc) => { 
+
+        this.fillOptionsOrientadores();
+
+        const url = window.server + "/tcc/" + tcc.id;
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    return response.json();
+                } else{
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            }).then((data) => {
+                console.error(data);
+                this.setState({ 
+                    toEditItem: data,
+                    showModalEdit: true,
+                    tituloTcc: data.titulo,
+                    resumo: data.resumo,
+                    selectedCurso: { value: data.idCurso, label: data.idCurso },
+                    selectedAluno: { value: data.idAluno, label: data.idAluno },
+                    selectedOrientador: { value: data.idOrientador, label: data.idOrientador } });
+            })
+            .catch((error) => {
+                console.error('Erro:', error);
+            });
+    }
+
     componentDidMount() {
         this.fillList();
     }
@@ -214,6 +346,8 @@ class TCC extends Component {
                         <div className='alert alert-success fw-bold pt-1 d-none' id='messageTccCreated' role='alert'><i className='bi bi-check2-square fs-2'></i> Trabalho criado com sucesso!</div>
                     </div>
                 </div>
+
+                <ToastContainer />
                 
                 <div className="card mx-5 p-3">
                     <div className="card-body">
@@ -225,6 +359,7 @@ class TCC extends Component {
                                         <th scope="col">Título</th>
                                         <th scope="col">Aluno</th>
                                         <th scope="col">Orientador</th>
+                                        <th scope="col">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -235,6 +370,11 @@ class TCC extends Component {
                                                 <td className="text-center">{tcc.titulo}</td>
                                                 <td className="text-center">{tcc.nomeCompletoAluno}</td>
                                                 <td className="text-center">{tcc.nomeCompletoOrientador}</td>
+                                                <td className='text-center'>
+                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto" onClick={() => this.beginView(tcc)}><i className="bi bi-eye"></i></button>
+                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto" onClick={() => this.beginEdit(tcc)}><i className="bi bi-pencil"></i></button>
+                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(tcc)}><i className="bi bi-trash"></i></button>
+                                                </td>
                                             </tr>
                                         )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum trabalho encontrado</td></tr> }
                                 </tbody>
@@ -244,6 +384,34 @@ class TCC extends Component {
                                     </tr>       
                                 </tfoot> */}
                             </table>
+                            <div className='row'>
+                                <div className='col-2'>
+                                    <label htmlFor="itensQuantityCombo" className="form-label fw-lighter font-small me-2">Itens / pág.</label>
+                                    <select className="form-select form-select-sm d-inline" arial-label="Combo for itens per page" value={this.state.itensPerPage} onChange={this.itensQuantityComboChange} id='itensQuantityCombo'>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="25">25</option>
+                                    </select>
+                                </div>
+                                <div className='col-7 text-center '>
+                                    <button className="btn btn-danger m-1" onClick={() => this.beginDeletion(this.state.selectedInstitutesId)}>Excluir seleção</button>
+                                </div>
+                                <div className='col-3 text-end'>
+                                    <p className='fw-lighter font-small me-2 d-inline'>Pág. atual:</p>
+                                    <button onClick={this.goToFirstPage} className='btn btn-light ps-1 pe-1'><i className="bi bi-chevron-double-left"></i></button>
+                                    <button onClick={this.goToPreviousPage} className='btn btn-light ps-1 pe-1'><i className="bi bi-chevron-left"></i></button>
+                                    <p className='d-inline ps-2 pe-2 fs-6 align-middle'>{this.state.currentPage + 1}</p>
+                                    <button onClick={this.goToNextPage} className='btn btn-light ps-1 pe-1'><i className="bi bi-chevron-right"></i></button>
+                                    <button onClick={this.goToLastPage} className='btn btn-light ps-1 pe-1'><i className="bi bi-chevron-double-right"></i></button>
+                                </div>
+                            </div>
+                            <div className='row'>
+                                <div className='col-12 text-end'>
+                                    <p className='fw-lighter font-small d-inline'>{(this.state.institutes && this.state.institutes.length > 0) ? ('Exibindo itens ' + (Number(this.state.currentOffset)+Number(1)) + ' ao ' + (Number(this.state.currentOffset)+Number(this.state.displayedItens)) + ' de um total de ' + this.state.totalItens) :  ('Não há itens')}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -267,6 +435,7 @@ class TCC extends Component {
                                 data-bs-dismiss="modal"
                                 aria-label="Close"
                                 style={{filter: 'invert(1)'}}
+                                onClick={this.clearState}
                             ></button>
                         </div>
                         <form onSubmit={this.submitTCCForm}>
@@ -275,11 +444,11 @@ class TCC extends Component {
                                         <div className="mb-3 row">
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Título</label>
-                                                <input type="text" className="form-control" name="tituloTcc" id="tituloTcc" onChange={this.handleChange} required/>
+                                                <input type="text" className="form-control" name="tituloTcc" id="tituloTcc" onChange={this.handleChange} value={this.state.tituloTcc} required/>
                                             </div>
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Resumo</label>
-                                                <textarea rows="3" className='form-control' style={{resize: "none"}}></textarea>
+                                                <textarea rows="3" className='form-control' style={{resize: "none"}} name="resumo" onChange={this.handleChange} value={this.state.resumo}></textarea>
                                             </div>
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
@@ -292,7 +461,8 @@ class TCC extends Component {
                                                     name="selectCurso"
                                                     options={this.state.optionsCursos}
                                                     noOptionsMessage={() => "Não há cursos cadastrados"}
-                                                    onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption.value, isCursoInvalid: !selectedOption })}
+                                                    onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption, isCursoInvalid: !selectedOption })}
+                                                    value={this.state.selectedCurso}
                                                 />
                                                 {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
                                             </div>
@@ -308,7 +478,8 @@ class TCC extends Component {
                                                     name="selectAluno"
                                                     options={this.state.optionsAlunos}
                                                     noOptionsMessage={() => "Não há alunos cadastrados"}
-                                                    onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption.value, isAlunoInvalid: !selectedOption })}
+                                                    onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption, isAlunoInvalid: !selectedOption })}
+                                                    value={this.state.selectedAluno}
                                                 />
                                                 {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
                                             </div>
@@ -324,7 +495,8 @@ class TCC extends Component {
                                                     name="selectOrientador"
                                                     options={this.state.optionsOrientadores}
                                                     noOptionsMessage={() => "Não há orientadores cadastrados"}
-                                                    onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption.value, isOrientadorInvalid: !selectedOption })}
+                                                    value={this.state.selectedOrientador}
+                                                    onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
                                                 />
                                                 {this.state.isOrientadorInvalid && <div className="invalid-feedback">Por favor, selecione um orientador.</div>}
                                             </div>
@@ -332,13 +504,136 @@ class TCC extends Component {
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" id="btnCloseModal" className="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                <button type="button" id="btnCloseModal" className="btn btn-secondary" data-bs-dismiss="modal" onClick={this.clearState}>Fechar</button>
                                 <button type="submit" className="btn btn-primary">Salvar</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+
+            <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
+                <Modal.Header className='bg-dark text-white' closeButton>
+                <Modal.Title>Confirmar Exclusão</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Tem certeza que deseja excluir o trabalho <span className='fw-bold'>{this.state.toDeletionItem && this.state.toDeletionItem.titulo}</span>?</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={() => this.closeModal('Deletion')}>
+                    Cancelar
+                </Button>
+                <Button variant="primary" onClick={this.delete}>
+                    Confirmar
+                </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
+                <Modal.Header className='bg-dark text-white' closeButton>
+                <Modal.Title>Resumo {this.state.toViewItem && this.state.toViewItem.titulo}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                {this.state.toViewItem && <>
+                        <div>
+                            <h5>Título:</h5>
+                            <p>{this.state.toViewItem.titulo}</p>
+                        </div>
+                        <div>
+                            <h5>Resumo:</h5>
+                            <p>{this.state.toViewItem.resumo}</p>
+                        </div>
+                        <div>
+                            <h5>Autor:</h5>
+                            <p>{this.state.toViewItem.idAluno}</p>
+                        </div>
+                        <div>
+                            <h5>Autor:</h5>
+                            <p>{this.state.toViewItem.idOrientador}</p>
+                        </div>
+                        <div>
+                            <h5>Curso:</h5>
+                            <p>{this.state.toViewItem.idCurso}</p>
+                        </div>
+                        </>
+                    }
+                </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={() => this.closeModal('View')}>
+                    Fechar
+                </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
+                <Modal.Header className='bg-dark text-white' closeButton>
+                <Modal.Title>Editar {this.state.toEditItem && this.state.toEditItem.titulo}</Modal.Title>
+                </Modal.Header>
+                <form onSubmit={this.submitTCCForm}>
+                <Modal.Body>
+                    {this.state.toEditItem && <>
+                        <div className="modal-body">
+                            <div className="container">
+                                    <div className="mb-3 row">
+                                        <div className="col-12">
+                                            <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Título</label>
+                                            <input type="text" className="form-control" name="tituloTcc" id="tituloTcc" onChange={this.handleChange} value={this.state.tituloTcc} required/>
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Resumo</label>
+                                            <textarea rows="3" className='form-control' style={{resize: "none"}} name="resumo" onChange={this.handleChange} value={this.state.resumo}></textarea>
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
+                                            <Select
+                                                isDisabled
+                                                className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
+                                                classNamePrefix="select"
+                                                name="selectCurso"
+                                                options={this.state.optionsCursos}
+                                                value={this.state.selectedCurso}
+                                            />
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Aluno</label>
+                                            <Select
+                                                isDisabled
+                                                className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
+                                                classNamePrefix="select"
+                                                name="selectAluno"
+                                                options={this.state.optionsAlunos}
+                                                value={this.state.selectedAluno}
+                                            />
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
+                                            <Select
+                                                className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
+                                                classNamePrefix="select"
+                                                defaultValue={defaultSelectOption}
+                                                // isLoading={isLoading}
+                                                isClearable={true}
+                                                isSearchable={true}
+                                                name="selectOrientador"
+                                                options={this.state.optionsOrientadores}
+                                                noOptionsMessage={() => "Não há orientadores cadastrados"}
+                                                value={this.state.selectedOrientador}
+                                                onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
+                                            />
+                                            {this.state.isOrientadorInvalid && <div className="invalid-feedback">Por favor, selecione um orientador.</div>}
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </>
+                    }
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.closeModal('Edit')}>
+                        Fechar
+                    </Button>
+                    <button type='submit' className="btn btn-primary">Salvar</button>
+                </Modal.Footer>
+                </form>
+            </Modal>
             
             {/* <!-- Optional: Place to the bottom of scripts -->
             <script>
