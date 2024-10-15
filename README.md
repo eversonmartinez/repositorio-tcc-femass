@@ -37,50 +37,68 @@
       </ul>
     </li>
     <li><a href="#contributing">Contribuindo</a></li>
-    <li><a href="#acknowledgments">Contribuidores</a></li>
+    <li><a href="#how-to-run">Como executar?</a></li>
+    <li><a href="#contributors">Contribuidores</a></li>
   </ol>
 </details>
 
 
 
 <!-- ABOUT THE PROJECT -->
+<a id="about-the-project"></a>
 ## Sobre o projeto
 
 Nesse projeto estabeleceremos uma maneira dos professores de TCC terem o controle sobre os alunos que estão elaborando seu trabalho de conclusão de curso. Aqui será possível
 ter um controle sobre o andamento dos projetos, desde a listagem até a descrição detalhada dos mesmos. Será possível também que a comunicação entre professores e alunos
 sobre informações específicas ocorra.
 
-<p align="right">(<a href="#readme-top">Voltar para o topo</a>)</p>
 
 
-
+<a id="built-with"></a>
 ### Construído com
 
 * [![React][React.js]][React-url]
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
 * [![Spring-Boot][Spring-Boot]][SpringBoot-url]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Voltar para o topo</a>)</p>
+
+<a id="contributing"></a>
+  <!-- CONTRIBUTING -->
+  ## Contribuindo
+  
+  Para fazer alguma contribuição (commit) seguir os seguintes passos:
+  
+  1. Criar uma nova branch para a demanda
+  2. Commitar nelas as mudanças
+  4. Fazer o push da branch para o repositório github
+  5. Abrir uma Pull Request com a 'main' como 'base' e a sua como 'compare'
+  6. Após as revisões, sua branch será mesclada com a main
+  
+  <p align="right">(<a href="#readme-top">Voltar para o topo</a>)</p>
 
 
-<!-- CONTRIBUTING -->
-## Contribuindo
+<a id="how-to-run"></a>
+## Como executar?
 
-Para fazer alguma contribuição (commit) seguir os seguintes passos:
+O projeto está separado em duas aplicações: React no frontend e Java/Spring Boot no backend.
 
-1. Criar uma nova branch para a demanda
-2. Commitar nelas as mudanças
-4. Fazer o push da branch
-5. Abrir um Pull Request
+As duas devem estar em execução simultaneamente, para que se integrem.
 
 
+Informações mais precisas sobre como iniciá-las poderão ser encontradas em suas respectivas subpastas.
+
+<p align="right">(<a href="#readme-top">Voltar para o topo</a>)</p>
+
+
+<a id="contributors"></a>
 ## Contribuidores
 
 <a href="https://github.com/martinelli/femasssistemas/graphs/contributors">
 
 </a>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">Voltar para o topo</a>)</p>
 
 
 
