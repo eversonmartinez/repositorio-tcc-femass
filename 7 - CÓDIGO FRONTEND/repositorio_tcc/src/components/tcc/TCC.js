@@ -1,4 +1,4 @@
-import React, { Component, lazy } from 'react'
+import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../navbar/Navbar';
 import '../../assets/css/tcc.css';
@@ -7,6 +7,7 @@ import { Button, Modal } from 'react-bootstrap';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';  // Import the CSS for default styles
+import DataTable from 'react-data-table-component';
 
 function withNavigate(Component) {
     return (props) => {
@@ -21,6 +22,7 @@ class TCC extends Component {
   
     state = {
         tccs: [],
+        filteredItems: [],
         optionsAlunos: [],
         optionsOrientadores: [],
         optionsCursos: [
@@ -37,13 +39,81 @@ class TCC extends Component {
         selectedOrientador: null,
         resumo: '',
         tituloTcc: '',
-        showModalDeletion: false,
         toDeletionItem: null,
         showModalDeletion: false,
-        toViewItem: null
+        showModalEdit: false,
+        showModalView: false,
+        toViewItem: null,
+        toEditItem: null,
+        filterTitulo: '',
+        filterAluno: '',
+        filterOrientador: ''
+    }
+
+    columns = [
+        {
+          name: 'Título',
+          selector: tcc => tcc.titulo,
+          sortable: true,
+           width: '38%'
+        },
+        {
+          name: 'Nome',
+          selector: tcc => tcc.nomeCompletoAluno,
+          sortable: true,
+          width: '25%'
+        },
+        {
+          name: 'Orientador',
+          selector: tcc => tcc.nomeCompletoOrientador,
+          sortable: true,
+           width: '25%'
+        },
+        {
+            name: 'Ações',
+            cell: tcc => <>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto" onClick={() => this.beginView(tcc)}><i className="bi bi-eye"></i></button>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto" onClick={() => this.beginEdit(tcc)}><i className="bi bi-pencil"></i></button>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(tcc)}><i className="bi bi-trash"></i></button>
+            </>,
+             width: '12%'
+        }
+    ];
+
+
+    tableStyle = {
+        headCells: {
+            style: {
+            backgroundColor: 'black',  // Cor de fundo preta
+            color: 'white',            // Cor do texto branca para contraste
+            fontWeight: 'bold',        // Deixar o texto em negrito
+            fontSize: '1.5em',         // Tamanho da fonte
+            },
+        },
+    };
+
+    applyFilters = () => {
+        this.setState((prevState) => ({
+            filteredItems: prevState.tccs.filter((tcc) => {
+                return (
+                    (prevState.filterTitulo === '' || tcc.titulo.toLowerCase().includes(prevState.filterTitulo.toLowerCase())) &&
+                    (prevState.filterAluno === '' || tcc.nomeCompletoAluno.toLowerCase().includes(prevState.filterAluno.toLowerCase())) &&
+                    (prevState.filterOrientador === '' || tcc.nomeCompletoOrientador.toLowerCase().includes(prevState.filterOrientador.toLowerCase()))
+                );
+            })
+        }));
+    }
+
+    handleFilterChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value }, this.applyFilters);
+    };
+
+    clearFilters = () => {
+        this.setState({filterTitulo: '', filterAluno: '', filterOrientador: ''}, this.applyFilters);
     }
 
     handleChange = (event) => {
+        if(event.target.name.startsWith('filter')) this.applyFilters();
         this.setState({ [event.target.name]: event.target.value });
     };
 
@@ -62,7 +132,7 @@ class TCC extends Component {
 
         fetch(url,requestOptions)
             .then((response) => response.json())
-                .then((data) => this.setState({tccs: data}))
+                .then((data) => this.setState({tccs: data, filteredItems: data}));
     }
 
     backToHome = () => {
@@ -149,7 +219,7 @@ class TCC extends Component {
         
         if(!this.validateForm()) return;
 
-        const url = window.server + "/tcc";
+        let url = window.server + "/tcc";
 
         const token = sessionStorage.getItem('token');
 
@@ -164,7 +234,7 @@ class TCC extends Component {
             data.resumo = this.state.resumo;
         }
 
-        const requestOptions = {
+        let requestOptions = {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token, // Adicione o token JWT
@@ -173,38 +243,63 @@ class TCC extends Component {
             body: JSON.stringify(data)
         };
 
+        if(this.state.toEditItem){
+            requestOptions.method = 'PUT';
+            url+= "/" + this.state.toEditItem.id;
+        }
+
         fetch(url, requestOptions)
         .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
-                console.error(response);
                 throw new Error('Erro na requisição: ' + response.status);
             }
         })
         .then(data => {
-            document.getElementById('btnCloseModal').click();
+            if(this.state.toEditItem){
+                this.setState({showModalEdit: false})
+                toast.success('TCC atualizado!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+            } else{
+                document.getElementById('btnCloseModal').click();
+                toast.success('TCC criado!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
             this.clearState();
             this.fillList();
-            document.getElementById('messageTccCreated').classList.remove('d-none');
-            setTimeout(() => document.getElementById('messageTccCreated').classList.add('d-none'), 5000);
             // Lógica para lidar com a resposta da API
         })
         .catch(error => {
-            console.error('Erro:', error);
+            toast.error('Ocorreu um erro', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
             // Lógica para lidar com o erro
         });
     }
 
-    beginEdit = (institute) => {
-		this.clearState();
-		this.setState({ creating: false })
-		this.setState({ editing: true, id: institute.id, name: institute.name, acronym: institute.acronym })
-	}
-
     beginDeletion = (tccs) => {
-        this.state.toDeleteItem = tccs;
-        this.setState({ showModalDeletion: true });
+        this.setState({ toDeleteItem: tccs, showModalDeletion: true });
 	}
 
     delete = () => {
@@ -245,7 +340,6 @@ class TCC extends Component {
                         draggable: true,
                         progress: undefined,
                       });
-                    console.error(response);
                     throw new Error('Erro na requisição: ' + response.status);
                 }
             });
@@ -277,11 +371,9 @@ class TCC extends Component {
                     throw new Error('Erro na requisição: ' + response.status);
                 }
             }).then((data) => {
-                console.error(data);
                 this.setState({ toViewItem: data, showModalView: true });
             })
             .catch((error) => {
-                console.error('Erro:', error);
             });
     }
 
@@ -309,7 +401,6 @@ class TCC extends Component {
                     throw new Error('Erro na requisição: ' + response.status);
                 }
             }).then((data) => {
-                console.error(data);
                 this.setState({ 
                     toEditItem: data,
                     showModalEdit: true,
@@ -320,8 +411,23 @@ class TCC extends Component {
                     selectedOrientador: { value: data.idOrientador, label: data.idOrientador } });
             })
             .catch((error) => {
-                console.error('Erro:', error);
             });
+    }
+
+    filterTextTitulo_change = (event) => {
+        const searchText = event.target.value;
+
+        this.setState({ filterTextTitulo: searchText });
+
+        if (searchText === '') {
+            this.setState({ filteredItems: this.state.tccs });
+          } else {
+            // Caso contrário, filtra os dados com base no texto inserido
+            const filtered = this.state.tccs.filter(item =>
+              item.titulo.toLowerCase().includes(searchText.toLowerCase())
+            );
+            this.setState({ filteredItems: filtered });
+          }
     }
 
     componentDidMount() {
@@ -334,57 +440,106 @@ class TCC extends Component {
             <Navbar />
             <div className='page-content'>
                 <h1 className='display-6 fw-bold text-decoration-underline p-3'>Trabalhos de Conclusão de Curso</h1>
-                <div className='d-flex justify-content-between row'>
-                    <div className='col-5'>
-                        <div className="card mx-5 mb-4 w-25">
-                            <div className="card-body">
-                            <button type="button" className="btn btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#insertionModal" onClick={this.beginInsertion}><i className="bi bi-plus-circle-dotted fs-6 me-2"></i>Incluir</button>
-                            </div>
+                
+                <ToastContainer />
+
+                <div className='col-12 col-md-3 ms-5'>
+                    <div className="card mx-3" style={{ maxWidth: '200px' }}>
+                        <div className="card-body">
+                            <button 
+                                type="button" 
+                                className="btn btn-success fw-bold w-100" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#insertionModal" 
+                                onClick={this.beginInsertion}
+                            >
+                                <i className="bi bi-plus-circle-dotted fs-6 me-2"></i>Incluir
+                            </button>
                         </div>
                     </div>
-                    <div className='col-3'>
-                        <div className='alert alert-success fw-bold pt-1 d-none' id='messageTccCreated' role='alert'><i className='bi bi-check2-square fs-2'></i> Trabalho criado com sucesso!</div>
-                    </div>
                 </div>
-
-                <ToastContainer />
                 
                 <div className="card mx-5 p-3">
                     <div className="card-body">
                         <div className="table-responsive border-rounded">
-                            <table className="table table-hover rounded-2" id="data-table">
-                                <thead className='text-center table-dark'>
-                                    <tr>
-                                        {/* <th scope="col">Id</th> */}
-                                        <th scope="col">Título</th>
-                                        <th scope="col">Aluno</th>
-                                        <th scope="col">Orientador</th>
-                                        <th scope="col">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.state.tccs && this.state.tccs.length > 0 ? this.state.tccs.map(tcc => (
-                                        <tr key={tcc.id}>
-                                                {/* <th scope="row">{tcc.id}</th> */}
-                                                {/* <td>{tcc.nomeCompleto}</td> */}
-                                                <td className="text-center">{tcc.titulo}</td>
-                                                <td className="text-center">{tcc.nomeCompletoAluno}</td>
-                                                <td className="text-center">{tcc.nomeCompletoOrientador}</td>
-                                                <td className='text-center'>
-                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto" onClick={() => this.beginView(tcc)}><i className="bi bi-eye"></i></button>
-                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto" onClick={() => this.beginEdit(tcc)}><i className="bi bi-pencil"></i></button>
-                                                    <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(tcc)}><i className="bi bi-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                        )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum trabalho encontrado</td></tr> }
-                                </tbody>
-                                {/* <tfoot className='table-dark'>
-                                    <tr>
-                                        <td colSpan="3" className="text-center">Footer Content</td>
-                                    </tr>       
-                                </tfoot> */}
-                            </table>
-                            <div className='row'>
+                            
+                            {/* Campos de filtro */}
+                            <div className="form-group row mb-4">
+                                <div className='col-md-11 d-flex'>
+                                    <div className="col-md-4 mx-1">
+                                        <label htmlFor="filterTitulo">Título</label>
+                                        <input
+                                            id="filterTitulo"
+                                            name='filterTitulo'
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Buscar título..."
+                                            value={this.state.filterTitulo}
+                                            onChange={this.handleFilterChange}
+                                        />
+                                    </div>
+
+                                    <div className="col-md-4 mx-1">
+                                        <label htmlFor="filterAluno">Aluno</label>
+                                        <input
+                                            id="filterAluno"
+                                            name="filterAluno"
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Buscar aluno..."
+                                            value={this.state.filterAluno}
+                                            onChange={this.handleFilterChange}
+                                        />
+                                    </div>
+
+                                    <div className="col-md-4 mx-1">
+                                        <label htmlFor="filterOrientador">Orientador</label>
+                                        <input
+                                            id="filterOrientador"
+                                            type="text"
+                                            className="form-control"
+                                            name="filterOrientador"
+                                            placeholder="Buscar orientador..."
+                                            value={this.state.filterOrientador}
+                                            onChange={this.handleFilterChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-md-1 d-flex align-items-end">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary py-0 px-2 "
+                                        onClick={this.clearFilters}
+                                        title="Limpar filtros"
+                                    >
+                                        <i className="bi bi-x fs-4"></i> {/* Ícone de "X" do Bootstrap */}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <DataTable
+                                columns={this.columns}
+                                data={this.state.filteredItems}
+                                pagination
+                                customStyles={this.tableStyle}
+                                responsive
+                                fixedHeader
+                                noDataComponent="Nenhum trabalho encontrado"
+                                
+                                subHeaderComponent={
+                                    <div className='form-group'>
+                                    < input id='filterTextTitulo' type="text" className='form-control' placeholder="Buscar título..." 
+                                    value={this.state.filterTextTitulo}
+                                    onChange={this.filterTextTitulo_change}
+                                    
+                                    />
+                                    </div>
+                                }
+                                
+                                style={{ width: '100%' }}
+                            />
+                            {/* <div className='row'>
                                 <div className='col-2'>
                                     <label htmlFor="itensQuantityCombo" className="form-label fw-lighter font-small me-2">Itens / pág.</label>
                                     <select className="form-select form-select-sm d-inline" arial-label="Combo for itens per page" value={this.state.itensPerPage} onChange={this.itensQuantityComboChange} id='itensQuantityCombo'>
@@ -396,7 +551,6 @@ class TCC extends Component {
                                     </select>
                                 </div>
                                 <div className='col-7 text-center '>
-                                    <button className="btn btn-danger m-1" onClick={() => this.beginDeletion(this.state.selectedInstitutesId)}>Excluir seleção</button>
                                 </div>
                                 <div className='col-3 text-end'>
                                     <p className='fw-lighter font-small me-2 d-inline'>Pág. atual:</p>
@@ -409,9 +563,9 @@ class TCC extends Component {
                             </div>
                             <div className='row'>
                                 <div className='col-12 text-end'>
-                                    <p className='fw-lighter font-small d-inline'>{(this.state.institutes && this.state.institutes.length > 0) ? ('Exibindo itens ' + (Number(this.state.currentOffset)+Number(1)) + ' ao ' + (Number(this.state.currentOffset)+Number(this.state.displayedItens)) + ' de um total de ' + this.state.totalItens) :  ('Não há itens')}</p>
+                                    <p className='fw-lighter font-small d-inline'>{(this.state.tccs && this.state.tccs.length > 0) ? ('Exibindo itens ' + (Number(this.state.currentOffset)+Number(1)) + ' ao ' + (Number(this.state.currentOffset)+Number(this.state.displayedItens)) + ' de um total de ' + this.state.totalItens) :  ('Não há itens')}</p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
