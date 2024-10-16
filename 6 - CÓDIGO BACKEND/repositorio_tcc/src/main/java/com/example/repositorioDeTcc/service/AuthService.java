@@ -56,11 +56,13 @@ public class AuthService {
 
 
             } else {
-                return ResponseEntity.badRequest().body(new LoginResponseDTO("Email or Matricula must be provided."));
+                return ResponseEntity.badRequest().body(new LoginErroDTO("Email or Matricula must be provided."));
             }
             var token = tokenService.generateToken(user);
 
-
+            if(user.getMustChangePassword()){
+                return ResponseEntity.ok(new LoginResponseMustChangeDTO(token, true));
+            }
             return ResponseEntity.ok(new LoginResponseDTO(token));
 
         } catch (Exception e) {
@@ -69,8 +71,8 @@ public class AuthService {
     }
 
     public ResponseEntity<?> register(RegisterUserDTO registerUserDTO) {
-        if(userRepository.findByEmail(registerUserDTO.email()) != null) return ResponseEntity.badRequest().body("Email já está em uso");
-        if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body("Matricula já existe");
+        if(userRepository.findByEmail(registerUserDTO.email()) != null) return ResponseEntity.badRequest().body(new LoginErroDTO("Email Already taken"));
+        if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body(new LoginErroDTO("Matricula already taken"));
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerUserDTO.password());
         String role = "USER";
@@ -82,7 +84,7 @@ public class AuthService {
     }
 
 
-    public void changePassword(ChangePasswordRequestDTO request, Principal connectedUser) {
+    public ResponseEntity<?> changePassword(ChangePasswordRequestDTO request, Principal connectedUser) {
         var user = ((User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal());
 
         if(!passwordEncoder.matches(request.currentPassword(), user.getPassword())){
@@ -95,6 +97,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setMustChangePassword(false);
         userRepository.save(user);
+        var token = tokenService.generateToken(user);
+        return ResponseEntity.ok(new LoginResponseDTO(token));
 
     }
 }

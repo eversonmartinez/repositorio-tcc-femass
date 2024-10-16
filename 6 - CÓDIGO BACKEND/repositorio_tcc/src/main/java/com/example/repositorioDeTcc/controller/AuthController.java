@@ -33,9 +33,8 @@ public class AuthController {
     }
 
     @PatchMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal connectedUser){
-        authService.changePassword(request, connectedUser);
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request, Principal connectedUser){
+        return authService.changePassword(request, connectedUser);
     }
 
 }
