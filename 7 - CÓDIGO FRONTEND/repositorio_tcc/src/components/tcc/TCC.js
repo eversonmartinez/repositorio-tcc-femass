@@ -400,15 +400,16 @@ class TCC extends Component {
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
                 }
-            }).then((data) => {
+            }).then((data) => { 
+                if (data.resumo === null) data.resumo = '';
                 this.setState({ 
                     toEditItem: data,
                     showModalEdit: true,
                     tituloTcc: data.titulo,
                     resumo: data.resumo,
                     selectedCurso: { value: data.idCurso, label: data.idCurso },
-                    selectedAluno: { value: data.idAluno, label: data.idAluno },
-                    selectedOrientador: { value: data.idOrientador, label: data.idOrientador } });
+                    selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
+                    selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } });
             })
             .catch((error) => {
             });
