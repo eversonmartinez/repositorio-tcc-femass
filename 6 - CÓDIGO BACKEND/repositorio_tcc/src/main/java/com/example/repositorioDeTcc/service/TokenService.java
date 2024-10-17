@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 
 @Service
 public class TokenService {
@@ -24,10 +25,11 @@ public class TokenService {
                     .withIssuer("SistemaTcc")
                     .withSubject(user.getEmail())
                     .withExpiresAt(genExpirationDate())
+                    .withClaim("mustChange", user.getMustChangePassword())
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro ao gerar o token", exception);
+            throw new RuntimeException("Fail to load token:", exception);
         }
     }
 
@@ -43,6 +45,20 @@ public class TokenService {
             return "";
         }
     }
+
+    public String getClaimFromToken(String token, String claimName) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("SistemaTcc")
+                    .build()
+                    .verify(token)
+                    .getClaim(claimName).asString();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Erro ao obter o claim do token", exception);
+        }
+    }
+
 
     private Instant genExpirationDate(){
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));

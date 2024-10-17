@@ -3,9 +3,11 @@ package com.example.repositorioDeTcc.controller;
 import com.example.repositorioDeTcc.dto.OrientadorDTO;
 import com.example.repositorioDeTcc.dto.OrientadorMinDTO;
 import com.example.repositorioDeTcc.service.OrientadorService;
+import com.example.repositorioDeTcc.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class OrientadorController {
 
     @Autowired
     OrientadorService service;
+    @Autowired
+    TokenService tokenService;
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<OrientadorDTO> findById(@PathVariable UUID id){

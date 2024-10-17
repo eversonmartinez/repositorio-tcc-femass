@@ -3,9 +3,12 @@ package com.example.repositorioDeTcc.controller;
 import com.example.repositorioDeTcc.dto.AlunoDTO;
 import com.example.repositorioDeTcc.dto.AlunoMinDTO;
 import com.example.repositorioDeTcc.service.AlunoService;
+import com.example.repositorioDeTcc.model.Role;
+import com.example.repositorioDeTcc.model.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/alunos")
 @CrossOrigin
+@PreAuthorize("hasAnyRole('USER','ADMIN','MODERATOR')")
 public class AlunoController {
 
     @Autowired
