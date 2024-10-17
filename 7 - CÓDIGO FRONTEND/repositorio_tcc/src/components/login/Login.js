@@ -5,7 +5,6 @@ import './login.css';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import the CSS for default styles
-import PasswordModalContext from '../passwordChange/PasswordModalContext'; // O contexto
 
 function withNavigate(Component) {
   return (props) => {
@@ -23,8 +22,6 @@ class Login extends Component {
     nomeCompleto: '',
     box: 'login'
   }
-
-  static contextType = PasswordModalContext;
 
   txtLogin_change = (event) => {
     this.setState({ login: event.target.value });
@@ -101,7 +98,7 @@ class Login extends Component {
                 progress: undefined,
               });
               setTimeout(() => {
-                if(response.data.mustChangePassword) { this.context.openModal(); }
+                if(response.data.mustChangePassword) { sessionStorage.setItem('mustChangePassword', JSON.stringify(true)); }
                 this.props.navigate('/');
               }, 1000);
             } else if (!response.ok){

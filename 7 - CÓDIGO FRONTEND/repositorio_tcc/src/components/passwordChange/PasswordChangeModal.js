@@ -81,6 +81,7 @@ const PasswordChangeModal = () => {
                 return response.json()
                     .then(data => {
                         sessionStorage.setItem('token', data.token);
+                        sessionStorage.removeItem('mustChangePassword');
                         toast.success('Senha alterada com sucesso!', {
                             position: "top-right",
                             autoClose: 1000,
@@ -117,8 +118,8 @@ const PasswordChangeModal = () => {
 
     return (
         <PasswordModalContext.Consumer>
-            {({ showModal, closeModal }) => (
-                <Modal show={showModal} centered size='lg'>
+            {({ showModal }) => (
+                <Modal show={showModal} centered size='lg' backdrop="static" keyboard={false}>
                     <ToastContainer />
                     <Modal.Header>
                         <Modal.Title>Alteração de Senha Necessária</Modal.Title>
