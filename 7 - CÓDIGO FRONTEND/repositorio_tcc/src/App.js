@@ -8,6 +8,7 @@ import FirstScreen from './components/firstScreen/FirstScreen.js';
 import ProtectedRoute from './HOC/ProtectedRoute';
 import Orientador from './components/orientador/Orientador.js';
 import TCC from './components/tcc/TCC.js';
+import CadastroOrientador from './components/orientador/CadastroOrientador.js';
 
 class App extends React.Component{
   
@@ -22,6 +23,7 @@ class App extends React.Component{
             <Route exact path="/alunos" element={<ProtectedRoute component={Aluno} />}></Route>
             <Route exact path="/orientadores" element={<ProtectedRoute component={Orientador} />}></Route>
             <Route exact path="/tcc" element={<ProtectedRoute component={TCC} />}></Route>
+            <Route exact path="/cadastroOrientador" element={<ProtectedRoute component={CadastroOrientador} />}></Route>
           </Routes>
         </div>
       </BrowserRouter>
