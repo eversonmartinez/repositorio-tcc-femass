@@ -101,4 +101,8 @@ public class AuthService {
         return ResponseEntity.ok(new LoginResponseDTO(token));
 
     }
+
+    public ResponseEntity<?> resetPassword(ResetPasswordDTO request, String token) {
+        var user = ((User) ((UsernamePasswordAuthenticationToken) token).getPrincipal());
+    }
 }
