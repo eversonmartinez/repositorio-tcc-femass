@@ -38,7 +38,7 @@ public class IsOTPFilterConfig implements Filter {
 
                 if (mustChange != null && mustChange) {
                     httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    httpResponse.getWriter().write("OTP token, can only be use for reseting passwords");
+                    httpResponse.getWriter().write("OTP token, can only be used for reseting passwords");
                     return;
                 }
             } catch (Exception e) {
