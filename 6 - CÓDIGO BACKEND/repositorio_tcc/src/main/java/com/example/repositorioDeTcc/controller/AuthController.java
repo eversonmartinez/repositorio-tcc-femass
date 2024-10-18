@@ -1,10 +1,9 @@
 package com.example.repositorioDeTcc.controller;
 
-import com.example.repositorioDeTcc.dto.ChangePasswordRequestDTO;
-import com.example.repositorioDeTcc.dto.LoginRequestDTO;
-import com.example.repositorioDeTcc.dto.RegisterUserDTO;
-import com.example.repositorioDeTcc.dto.ResetPasswordDTO;
+import com.example.repositorioDeTcc.dto.*;
 import com.example.repositorioDeTcc.service.AuthService;
+import com.example.repositorioDeTcc.service.MailService;
+import com.example.repositorioDeTcc.service.TokenService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import java.security.Principal;
 public class AuthController {
     @Autowired
     private AuthService authService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO){
         return authService.login(loginRequestDTO);
@@ -39,8 +39,13 @@ public class AuthController {
         return authService.changePassword(request, connectedUser);
     }
 
-    @PatchMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody @Valid ResetPasswordDTO request){
+    @PostMapping("/sendPasswordReset")
+    public ResponseEntity<?> sendPasswordResetToken(@RequestBody @Valid SendMailResetRequestDTO request){
+        return authService.sendMailReset(request);
+    }
+
+    @PatchMapping("/reset-password={token}")
+    public ResponseEntity<?> resetPassword(@PathVariable String token, @Valid @RequestBody ResetPasswordDTO request){
         return authService.resetPassword(request, token);
     }
 

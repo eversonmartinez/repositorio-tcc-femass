@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +37,7 @@ public class User implements Serializable, UserDetails {
 
     private Boolean mustChangePassword;
 
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -52,6 +54,10 @@ public class User implements Serializable, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
