@@ -11,6 +11,7 @@ import TCC from './components/tcc/TCC.js';
 import { PasswordModalProvider } from './components/passwordChange/PasswordModalContext'; // O provedor do contexto
 import PasswordChangeModal from './components/passwordChange/PasswordChangeModal'; // O modal global
 import ChangePassword from './HOC/ChangePassword.js';
+import CadastroOrientador from './components/orientador/CadastroOrientador.js';
 
 class App extends React.Component{
   
@@ -24,7 +25,7 @@ class App extends React.Component{
       <ProtectedRoute component={() => <ChangePassword component={Aluno} {...props} />} />
     );
     const ProtectedOrientador = (props) => (
-      <ProtectedRoute component={() => <ChangePassword component={Orientador} {...props} />} />
+      <ProtectedRoute component={() => <ChangePassword component={CadastroOrientador} {...props} />} />
     );
     const ProtectedTCC = (props) => (
       <ProtectedRoute component={() => <ChangePassword component={TCC} {...props} />} />
@@ -35,12 +36,12 @@ class App extends React.Component{
         <div className="container-fluid">
         <PasswordModalProvider>
           <Routes>
-              <Route exact path="/" element={<FirstScreen />}></Route>
-              <Route exact path="/login" element={<Login />}></Route>
-              <Route exact path="/home" element={<ProtectedHome />}></Route>
-              <Route exact path="/alunos" element={<ProtectedAluno />}></Route>
-              <Route exact path="/orientadores" element={<ProtectedOrientador />}></Route>
-              <Route exact path="/tcc" element={<ProtectedTCC />}></Route>
+            <Route exact path="/" element={<FirstScreen />}></Route>
+            <Route exact path="/login" element={<Login />}></Route>
+            <Route exact path="/home" element={<ProtectedHome />}></Route>
+            <Route exact path="/alunos" element={<ProtectedAluno />}></Route>
+            <Route exact path="/orientadores" element={<ProtectedOrientador />}></Route>
+            <Route exact path="/tcc" element={<ProtectedTCC />}></Route>
           </Routes>
           <PasswordChangeModal />
         </PasswordModalProvider>

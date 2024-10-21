@@ -45,6 +45,14 @@ body{
   background-color: #2C3D8F;
 }
 
+.page-content{
+  padding-top: 80px;
+}
+
+.large-modal{
+  width: 90%;
+}
+
 label.required:after {
   content: " *";
   color: red;
