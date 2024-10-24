@@ -14,5 +14,4 @@ import org.springframework.stereotype.Repository;
 public interface CategoriaRepository extends JpaRepository<Categoria, UUID>{
 @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Category i WHERE LOWER(i.nome) = LOWER(:nome)")
     boolean existsByNomeIgnoreCase(@Param("nome") String nome);
-    public List<Categoria> findAllByAtivoIsTrue();
 } 
