@@ -103,6 +103,9 @@ public class AuthService {
 
     public ResponseEntity<?> sendMailReset(SendMailResetRequestDTO request) {
         var user = userRepository.findByEmail(request.email());
+        if (user == null){
+            return ResponseEntity.ok().build();
+        }
         var token = tokenService.generateSingleToken((User) user);
         mailService.sendRecoverPassword(((User) user).getNomeCompleto(), request.email(),token);
         return ResponseEntity.ok().build();
@@ -125,6 +128,7 @@ public class AuthService {
             String encryptedPassword = new BCryptPasswordEncoder().encode(request.newPassword());
             user.setPassword(encryptedPassword);
             userRepository.insertToken(token);
+            user.setMustChangePassword(false);
             userRepository.save(user);
             token = tokenService.generateToken(user);
             return ResponseEntity.ok(new LoginResponseDTO(token));
