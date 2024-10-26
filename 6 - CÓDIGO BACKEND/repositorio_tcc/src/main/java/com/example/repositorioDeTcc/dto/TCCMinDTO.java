@@ -31,6 +31,6 @@ public class TCCMinDTO {
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
         this.idCurso = entity.getCurso();
-        this.idCategoria = entity.getCategoria().getIdCategoria();
+        this.idCategoria = entity.getCategoria().getId();
     }
 }

@@ -31,7 +31,7 @@ public class TCCDTO {
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
         this.idCurso = entity.getCurso();
-        this.idCategoria = entity.getCategoria().getIdCategoria();
+        this.idCategoria = entity.getCategoria().getId();
         this.resumo = entity.getResumo();
     }
 }

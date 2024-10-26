@@ -23,7 +23,7 @@ public class Categoria{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
-    private UUID idCategoria; 
+    private UUID id; 
     @Column(name = "nome_categoria", nullable = false, unique = true)
     private String nomeCategoria; 
     @Lob

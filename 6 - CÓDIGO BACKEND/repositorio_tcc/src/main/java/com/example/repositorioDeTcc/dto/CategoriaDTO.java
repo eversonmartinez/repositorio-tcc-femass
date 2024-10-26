@@ -15,7 +15,7 @@ import org.springframework.beans.BeanUtils;
 @Setter
 public class CategoriaDTO {
 
-    private UUID idCategoria;
+    private UUID id;
     private String nomeCategoria;
     private String descricaoCategoria;
 

@@ -33,7 +33,7 @@ public class CategoriaService {
 
     @Transactional (readOnly = true)
     public List<CategoriaDTO> findAll(){
-        List<Categoria> list = repository.findAllByAtivoIsTrue();
+        List<Categoria> list = repository.findAll();
         List<CategoriaDTO> listDTO = list.stream().map(categoria-> new CategoriaDTO(categoria)).toList();
         return listDTO;
     }
