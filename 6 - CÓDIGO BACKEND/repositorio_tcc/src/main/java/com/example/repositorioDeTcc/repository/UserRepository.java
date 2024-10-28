@@ -27,4 +27,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Modifying
     @Query(value = "INSERT INTO used_tokens (tokens) VALUES (:token)", nativeQuery = true)
     void insertToken(@Param("token") String token);
+
+    Boolean existsByMatricula(String matricula);
 }
