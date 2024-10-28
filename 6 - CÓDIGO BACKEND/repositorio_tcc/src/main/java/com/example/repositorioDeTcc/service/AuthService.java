@@ -80,6 +80,8 @@ public class AuthService {
 
         userRepository.save(newUser);
 
+        mailService.sendWelcomeEmail(registerUserDTO);
+
         return ResponseEntity.ok().build();
     }
 

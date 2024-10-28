@@ -1,5 +1,6 @@
 package com.example.repositorioDeTcc.service;
 
+import com.example.repositorioDeTcc.dto.RegisterUserDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,80 @@ public class MailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+            helper.setFrom(sender);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Erro ao enviar e-mail: " + e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendWelcomeEmail(RegisterUserDTO registerUserDTO) {
+        String subject = "Password reset";
+        String htmlContent = String.format(
+                """
+    <html>
+    <head>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                text-align: center;
+            }
+    
+            .container {
+                text-align: center;
+                max-width: 600px;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+            }
+    
+            p {
+                color: rgb(0, 0, 0) !important;
+            }
+    
+            .button p{
+                color: rgb(255, 255, 255) !important;
+            }
+    
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #007BFF;
+                border: none;
+                border-radius: 5px;
+                text-decoration: none;
+                transition: background-color 0.3s;
+            }
+    
+            .button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Olá, %s!</h1>
+            <h2>O seu cadastro no sistema de TCCs da femass foi criado com sucesso, bem vindo!</h2>
+            <h3>Seu usuário é: [%s] ou [%s]</h3>
+            <h3>Sua senha temporária é: [%s]</h3>
+            <p>Atenciosamente,<br>Faculdade Professor Miguel Angelo da Silva Santos</p>
+        </div>
+    </body>
+    </html>
+                """, registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), registerUserDTO.password());
+
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(registerUserDTO.email());
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
             helper.setFrom(sender);
