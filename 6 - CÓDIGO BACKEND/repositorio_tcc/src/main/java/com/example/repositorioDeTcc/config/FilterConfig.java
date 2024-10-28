@@ -14,6 +14,20 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/orientadores/*");
         registrationBean.addUrlPatterns("/tcc/*");
         registrationBean.addUrlPatterns("/categorias/*");
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<IsOTPFilterConfig> isOTPFilter(){
+        FilterRegistrationBean<IsOTPFilterConfig> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new IsOTPFilterConfig());
+        registrationBean.addUrlPatterns("/alunos/*");
+        registrationBean.addUrlPatterns("/orientadores/*");
+        registrationBean.addUrlPatterns("/tcc/*");
+        registrationBean.addUrlPatterns("/categorias/*");
+        registrationBean.addUrlPatterns("/auth/changePassword");
+        registrationBean.setOrder(2);
         return registrationBean;
     }
 }
