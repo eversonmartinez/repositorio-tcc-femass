@@ -26,7 +26,6 @@ public class Categoria{
     private UUID id; 
     @Column(name = "nome_categoria", nullable = false, unique = true)
     private String nomeCategoria; 
-    @Lob
     @Column(name = "descricao_categoria",nullable = false)
     private String descricaoCategoria; 
 

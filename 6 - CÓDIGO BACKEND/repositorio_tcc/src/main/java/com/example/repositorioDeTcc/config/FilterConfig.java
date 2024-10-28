@@ -13,6 +13,7 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/alunos/*");
         registrationBean.addUrlPatterns("/orientadores/*");
         registrationBean.addUrlPatterns("/tcc/*");
+        registrationBean.addUrlPatterns("/categorias/*");
         return registrationBean;
     }
 }
