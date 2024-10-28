@@ -104,6 +104,7 @@ class Login extends Component {
                 progress: undefined,
               });
               setTimeout(() => {
+                if(response.data.mustChangePassword) { sessionStorage.setItem('mustChangePassword', JSON.stringify(true)); }
                 this.props.navigate('/');
               }, 1000);
             } else if (!response.ok){
