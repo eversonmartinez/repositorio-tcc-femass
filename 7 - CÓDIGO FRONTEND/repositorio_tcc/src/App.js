@@ -6,12 +6,12 @@ import Home from './components/home/Home.js'
 import Aluno from './components/aluno/Aluno.js'
 import FirstScreen from './components/firstScreen/FirstScreen.js';
 import ProtectedRoute from './HOC/ProtectedRoute';
-import Orientador from './components/orientador/Orientador.js';
 import TCC from './components/tcc/TCC.js';
 import { PasswordModalProvider } from './components/passwordChange/PasswordModalContext'; // O provedor do contexto
 import PasswordChangeModal from './components/passwordChange/PasswordChangeModal'; // O modal global
 import ChangePassword from './HOC/ChangePassword.js';
 import CadastroOrientador from './components/orientador/CadastroOrientador.js';
+import Users from './components/users/Users.js';
 
 class App extends React.Component{
   
@@ -30,6 +30,9 @@ class App extends React.Component{
     const ProtectedTCC = (props) => (
       <ProtectedRoute component={() => <ChangePassword component={TCC} {...props} />} />
     );
+    const ProtectedUsers = (props) => (
+      <ProtectedRoute component={() => <ChangePassword component={Users} {...props} />} />
+    );
 
     return (
       <BrowserRouter>
@@ -42,6 +45,7 @@ class App extends React.Component{
             <Route exact path="/alunos" element={<ProtectedAluno />}></Route>
             <Route exact path="/orientadores" element={<ProtectedOrientador />}></Route>
             <Route exact path="/tcc" element={<ProtectedTCC />}></Route>
+            <Route exact path="/users" element={<ProtectedUsers />}></Route>
           </Routes>
           <PasswordChangeModal />
         </PasswordModalProvider>
