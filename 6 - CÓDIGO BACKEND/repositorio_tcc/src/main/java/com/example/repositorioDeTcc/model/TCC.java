@@ -35,16 +35,20 @@ public class TCC implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name="id_Categoria", referencedColumnName = "id", nullable = false)
     private Categoria categoria;
+    @ManyToOne(optional = false)
+    @JoinColumn(name="id_Subcategoria", referencedColumnName = "id", nullable = false)
+    private Subcategoria subcategoria;
 
     @Column
     private String resumo;
 
-    public TCC(String titulo, Aluno aluno, Orientador orientador, Integer curso,Categoria categoria, String resumo){
+    public TCC(String titulo, Aluno aluno, Orientador orientador, Integer curso,Categoria categoria, Subcategoria subcategoria, String resumo){
         this.titulo = titulo;
         this.aluno = aluno;
         this.orientador = orientador;
         this.curso = curso;
         this.categoria = categoria;
+        this.subcategoria = subcategoria;
         this.resumo = resumo;
     }
 }

@@ -14,6 +14,7 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/orientadores/*");
         registrationBean.addUrlPatterns("/tcc/*");
         registrationBean.addUrlPatterns("/categorias/*");
+        registrationBean.addUrlPatterns("/subcategorias/*");
         return registrationBean;
     }
 }
