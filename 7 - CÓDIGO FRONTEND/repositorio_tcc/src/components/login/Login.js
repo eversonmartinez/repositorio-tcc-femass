@@ -20,6 +20,7 @@ class Login extends Component {
     password: '',
     confPassword: '',
     nomeCompleto: '',
+    resetEmail: '',
     box: 'login'
   }
 
@@ -30,6 +31,11 @@ class Login extends Component {
   txtPassword_change = (event) => {
     this.setState({ password: event.target.value });
   }
+  
+  handleChange = (event) => {
+    if(event.target.name.startsWith('filter')) this.applyFilters();
+    this.setState({ [event.target.name]: event.target.value });
+  };
 
   login = async () => {
 
@@ -132,13 +138,14 @@ class Login extends Component {
       matricula: '',
       login: '',
       password: '',
-      confPassword: ''
+      confPassword: '',
+      resetEmail: ''
     });
   }
 
-  goToRegistration = () => {
+  goToResetPassword = () => {
     this.cleanState();
-    this.setState({box: 'registration'});
+    this.setState({box: 'resetPasswordS1'});
   }
 
   goToLogin = () => {
@@ -175,16 +182,13 @@ class Login extends Component {
   }
 
   validateForm = () => {
-    const { nomeCompleto, matricula, login, password, confPassword } = this.state;
-    if (!nomeCompleto || !matricula || !login || !password || !confPassword) {
+    if (!this.state.resetEmail) {
       return false;
     }
-    this.validatePassword();
-    const passwordConfElement = document.getElementById('passwordConfNewUser');
-    return passwordConfElement.checkValidity();
+    return true;
   };
   
-  register = (event) => {
+  resetPassword = (event) => {
     event.preventDefault();
     
     if (!this.validateForm()) {
@@ -200,13 +204,10 @@ class Login extends Component {
       return;
     }
 
-    var url = window.server + "/auth/register"
+    var url = window.server + "/auth/sendPasswordReset"
 
     const data = {
-      "nomeCompleto": this.state.nomeCompleto,
-      "matricula": this.state.matricula,
-      "email": this.state.login,
-      "password": this.state.password
+      "email": this.state.resetEmail
     }
 
     const requestOptions = {
@@ -220,21 +221,10 @@ class Login extends Component {
     fetch(url, requestOptions)
       .then((response) => {
         if (response.status === 200) {
-          toast.success('Usuário criado!', {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-          setTimeout(() => {
-            this.goToLogin();
-          }, 2000);
+          this.setState({box: 'resetPasswordS2'});
           return;
         } else {
-          toast.error('Erro ao criar', {
+          toast.error('Ocorreu um erro', {
             position: "top-right",
             autoClose: 2000,
             hideProgressBar: false,
@@ -276,62 +266,47 @@ class Login extends Component {
           </div>
         </div>
         <div className='mb-1 row'>
-          <a href='#' className='text-decoration-none' onClick={this.goToRegistration}>Registre-se</a>
+          <a href='#' className='text-decoration-none' onClick={this.goToResetPassword}>Esqueci a senha</a>
         </div>
       </> ;
-    } else if(this.state.box === 'registration') {
-      box = <>
-        <div className="alert alert-warning" role="alert">
-          Essa função provavelmente será removida, visto que o cadastro é feito pelo professor
-        </div>
-        <div className="alert d-none" id="message" role="alert">
-          Usuário cadastrado com sucesso!
-        </div>
-
-        <div className="alert alert-danger d-none" role="alert" id="messageAllFields">
-          <i className='bi bg-info'></i>Preencha todos os campos!
-        </div>
-        
-        <h2 className='fw-bold fs-4 text-decoration-underline mb-3' style={{color: '#404040'}}>Registre-se</h2>
-        <form onSubmit={this.register}>
-          <div className="mb-3 row justify-content-center">  
-            <div className='col-12'>
-              <label htmlFor="loginUser" className='required'>Nome completo</label>
-              <input type="text" className="form-control" id="nomeNewUser" required onChange={this.txtNomeCompleto_change}></input>
+    } else if(this.state.box.startsWith('resetPassword')) {
+      if(this.state.box === 'resetPasswordS1') {
+        box = <>
+          <h2 className='fw-bold fs-4 text-decoration-underline mb-3' style={{color: '#404040'}}>Esqueceu sua senha?</h2>
+          <form onSubmit={this.resetPassword}>
+            <div className='row mb-3'>
+              <div className='col-12 mt-3'>
+                <p>Não se preocupe. Vamos tentar te ajudar.<br/> Primeiro, digite seu e-mail abaixo:</p>
+              </div>
+              <div className='col-12'>
+                <label htmlFor="resetEmail" className='required'>E-mail</label>
+                <input type="email" className="form-control" id="resetEmail" name="resetEmail" required placeholder="email@email.com" onChange={this.handleChange}></input>
+              </div>
+            </div>
+            <div className='row'>
+              <div className='col-12 d-flex justify-content-between'>
+                <button className='btn btn-secondary' onClick={this.goToLogin}>Voltar</button>
+                <button className='btn btn-custom' type='submit'>Enviar</button>
+              </div>
+            </div>
+          </form>
+        </>;
+      } else if(this.state.box === 'resetPasswordS2') {
+        box = <>
+        {/* Essa parte ainda precisa ser revisada, para ver como ficará a partir daqui a integração com o backend */}
+          <h2 className='fw-bold fs-4 text-decoration-underline mb-3' style={{color: '#404040'}}>Esqueceu sua senha?</h2>
+          <div className='row'>
+            <div className='col-12 mt-3'>
+              <p>Enviamos um e-mail com as instruções para recuperação da sua senha.<br/> Por favor, verifique sua caixa de entrada.</p>
             </div>
           </div>
-          <div className="mb-3 row justify-content-center">  
-            <div className='col-12'>
-              <label htmlFor="loginUser" className='required'>Matrícula</label>
-              <input type="text" className="form-control" id="matriculaNewUser" required maxLength={11} onChange={this.txtMatricula_change}></input>
+          <div className='row'>
+            <div className='col-12 d-flex justify-content-end'>
+              <button className='btn btn-custom' onClick={this.goToLogin}>Voltar</button>
             </div>
           </div>
-          <div className="mb-3 row justify-content-center">  
-            <div className='col-12'>
-              <label htmlFor="loginUser" className='required'>E-mail</label>
-              <input type="email" className="form-control" id="loginNewUser" required placeholder="email@email.com" onChange={this.txtNewLogin_change}></input>
-            </div>
-          </div>
-          <div className="mb-4 row justify-content-center">
-            <div className='col-12'>
-              <label htmlFor="loginPassword" className="col-form-label required">Senha</label>
-              <input type="password" className="form-control" id="passwordNewUser" required onChange={this.txtNewPassword_change}></input>
-            </div>
-          </div>
-          <div className="mb-4 row justify-content-center">
-            <div className='col-12'>
-              <label htmlFor="loginPassword" className="col-form-label required">Confirme a senha</label>
-              <input type="password" className="form-control" id="passwordConfNewUser" onChange={this.txtConfPassword_change}></input>
-            </div>
-          </div>
-          <div className='mb-3 row'>
-            <div className='col-12 d-flex justify-content-between'>
-              <button className='btn btn-secondary' onClick={this.goToLogin}>Abandonar</button>
-              <button className='btn btn-dark' type='submit'>Criar</button>
-            </div>
-          </div>
-        </form>
-      </>;
+        </>;
+      }
     }
 
     return (
