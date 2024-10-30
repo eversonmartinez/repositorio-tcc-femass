@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -74,11 +75,15 @@ public class AuthService {
         if(userRepository.findByEmail(registerUserDTO.email()) != null) return ResponseEntity.badRequest().body(new LoginErroDTO("Email Already taken"));
         if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body(new LoginErroDTO("Matricula already taken"));
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(registerUserDTO.password());
+        String encryptedPassword = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
         String role = "USER";
         User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.valueOf(role));
 
-        userRepository.save(newUser);
+        User persistedUser = userRepository.save(newUser);
+
+        var token = tokenService.generateToken(persistedUser);
+
+        mailService.sendWelcomeEmail(registerUserDTO, token);
 
         return ResponseEntity.ok().build();
     }
