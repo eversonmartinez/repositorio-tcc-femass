@@ -43,7 +43,7 @@ public class MailService {
     @Async
     public void sendRecoverPassword(String person, String to, String token) {
         String subject = "Password reset";
-        String rota = frontendUrl + "/auth/reset-password?token=" + token;
+        String rota = frontendUrl + "/reset-password?token=" + token;
         String htmlContent = String.format(
                 """
     <html>
@@ -118,7 +118,7 @@ public class MailService {
     @Async
     public void sendWelcomeEmail(RegisterUserDTO registerUserDTO, String token) {
         String subject = "Bem vindo ao TCC Flow - Repositório de TCC da Femass";
-        String rota = frontendUrl + "/auth/reset-password?token=" + token + "&toemail=" + registerUserDTO.email();
+        String rota = frontendUrl + "/reset-password?token=" + token + "&toemail=" + registerUserDTO.email();
         String htmlContent = String.format(
                 """
     <html>
