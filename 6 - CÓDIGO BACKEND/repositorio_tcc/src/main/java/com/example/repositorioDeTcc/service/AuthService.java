@@ -81,11 +81,11 @@ public class AuthService {
 
         User persistedUser = userRepository.save(newUser);
 
-        var token = tokenService.generateSingleToken(persistedUser);
+        var token = tokenService.generateToken(persistedUser);
 
         mailService.sendWelcomeEmail(registerUserDTO, token);
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> changePassword(ChangePasswordRequestDTO request, Principal connectedUser) {
