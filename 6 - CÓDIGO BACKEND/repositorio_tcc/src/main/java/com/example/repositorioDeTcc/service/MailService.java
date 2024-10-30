@@ -17,6 +17,9 @@ public class MailService {
     @Value("${spring.mail.username}")
     String sender;
 
+    @Value("${frontend.url}")
+    String frontendUrl;
+
     private final JavaMailSender mailSender;
 
 
@@ -40,7 +43,7 @@ public class MailService {
     @Async
     public void sendRecoverPassword(String person, String to, String token) {
         String subject = "Password reset";
-        String rota = "http://localhost:8080/auth/reset-password="+token;
+        String rota = frontendUrl + "/auth/reset-password=" + token;
         String htmlContent = String.format(
                 """
     <html>
@@ -113,8 +116,9 @@ public class MailService {
     }
 
     @Async
-    public void sendWelcomeEmail(RegisterUserDTO registerUserDTO) {
-        String subject = "Password reset";
+    public void sendWelcomeEmail(RegisterUserDTO registerUserDTO, String token) {
+        String subject = "Bem vindo ao TCC Flow - Repositório de TCC da Femass";
+        String rota = frontendUrl + "/auth/reset-password=" + token;
         String htmlContent = String.format(
                 """
     <html>
@@ -165,12 +169,12 @@ public class MailService {
             <h1>Olá, %s!</h1>
             <h2>O seu cadastro no sistema de TCCs da femass foi criado com sucesso, bem vindo!</h2>
             <h3>Seu usuário é: [%s] ou [%s]</h3>
-            <h3>Sua senha temporária é: [%s]</h3>
+            <a class="button" href="%s"><p> Clique aqui para definir sua senha</p></a>
             <p>Atenciosamente,<br>Faculdade Professor Miguel Angelo da Silva Santos</p>
         </div>
     </body>
     </html>
-                """, registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), registerUserDTO.password());
+                """, registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), rota);
 
 
         try {
