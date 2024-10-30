@@ -13,6 +13,7 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/alunos/*");
         registrationBean.addUrlPatterns("/orientadores/*");
         registrationBean.addUrlPatterns("/tcc/*");
+        registrationBean.addUrlPatterns("/users/*");
         registrationBean.setOrder(1);
         return registrationBean;
     }
@@ -24,6 +25,7 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/alunos/*");
         registrationBean.addUrlPatterns("/orientadores/*");
         registrationBean.addUrlPatterns("/tcc/*");
+        registrationBean.addUrlPatterns("/users/*");
         registrationBean.addUrlPatterns("/auth/changePassword");
         registrationBean.setOrder(2);
         return registrationBean;
