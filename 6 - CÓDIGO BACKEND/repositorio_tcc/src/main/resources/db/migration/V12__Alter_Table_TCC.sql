@@ -1,3 +1,3 @@
 ALTER TABLE TCC
-ADD COLUMN id_Subcategoria UUID,
-ADD CONSTRAINT fk_tcc_subcategoria FOREIGN KEY (id_Subcategoria) REFERENCES subcategoria(id);
+ADD COLUMN id_Categoria UUID,
+ADD CONSTRAINT fk_tcc_categoria FOREIGN KEY (id_Categoria) REFERENCES categoria(id);
