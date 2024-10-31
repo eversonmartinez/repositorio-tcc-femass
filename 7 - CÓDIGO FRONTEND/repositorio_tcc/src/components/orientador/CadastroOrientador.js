@@ -1,9 +1,10 @@
-import React, { Component} from 'react'
+import React, { Component } from 'react'
 import logoFemass from './../../assets/images/logo-femass.png';
 import logo from './../../assets/images/Logo TCCFLOW.png';
 import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 import { ToastContainer, toast } from 'react-toastify';
+import DataTable from 'react-data-table-component';
 
 function withNavigate(Component) {
     return (props) => {
@@ -65,6 +66,10 @@ class cadastroOrientador extends Component {
                 }
             })
             .catch(e => { console.error(e) })
+        
+        setTimeout(() => {
+            this.fillList();
+        }, 5000);
     }
 
     txtNomeCompleto_change = (event) => {
@@ -86,10 +91,21 @@ class cadastroOrientador extends Component {
     // carregar os dados
 
     state = {
-        listOrientador: []
+        listOrientador: [],
+        showModalDeletion: false
     }
 
-    fillList = async () => {
+    // columns = [
+    //     {
+    //         name: "Ações",
+    //         cell: listOrientador => <>
+    //             <button class="btn btn-warning">editar</button>
+    //             <button class="btn btn-danger" onClick={this.beginDeletion(listOrientador)} >Deletar</button>
+    //         </>, width: '12%'
+    //     }
+    // ];
+
+    fillList = () => {
         const url = window.server + "/orientadores";
 
         const token = sessionStorage.getItem('token');
@@ -106,11 +122,11 @@ class cadastroOrientador extends Component {
             .then((response) => response.json())
             .then((data) => this.setState({ listOrientador: data, filteredItems: data }));
         
-        console.log(this.state.listOrientador);
+        //console.log(this.state.listOrientador);
     }
 
-    beginView = (listOrientador) => {
-        const url = window.server + "/orientadores/" + listOrientador.id;
+    beginView = () => {
+        const url = window.server + "/orientadores/" + this.setState.listOrientador.id;
 
         const token = sessionStorage.getItem('token');
 
@@ -136,6 +152,66 @@ class cadastroOrientador extends Component {
             });
     }
 
+    componentDidMount() {
+        this.fillList();
+    }
+
+    // Deletar orientador
+
+    beginDeletion = (listOrientador) => {
+        //console.log(listOrientador.nomeCompleto)
+        this.setState({ toDeleteItem: listOrientador, showModalDeletion: true });
+        console.log(this.state.toDeleteItem.id)
+    }
+
+    delete = (listOrientador) => {
+        console.log(listOrientador.id)
+        this.setState({ toDeleteItem: listOrientador, showModalDeletion: true });
+        console.log(this.state.toDeleteItem)
+
+        const url = window.server + "/orientadores/" + this.setState.toDeleteItem.id;
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url, requestOptions)
+            .then((response) => {
+                if (response.ok) {
+                    this.fillList();
+                    this.setState({ showModalDeletion: false });
+                    toast.success('Orientador excluído!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+                else {
+                    toast.error('Não foi possível excluir', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            });
+    }
+
+
     render() {
         return (
             <div>
@@ -149,9 +225,8 @@ class cadastroOrientador extends Component {
                     <div className='row mt-5 justify-content-center'>
                         <div className='col-10 col-md-6 col-lg-3'>
                             <div className='bg-white border rounded p-4'>
-                            
                                 <form onSubmit={this.resgister}>
-                                    <div><h1 class="display-6">Cadastro de Orientador</h1></div>
+                                    <div><h3 >Cadastro de Orientador</h3></div>
                                     <div class="mb-3 justify-content-center">
                                         <label for="exampleInputEmail1" class="form-label">Nome Completo</label>
                                         <input type="text" class="form-control" id="NomeOrientador" onChange={this.txtNomeCompleto_change} />
@@ -177,33 +252,43 @@ class cadastroOrientador extends Component {
                                     </div>
                                     <div class="mb-3 justify-content-center">
                                         <button class="btn btn-dark" type='submit'>Criar</button>
-                                        <button class="btn btn-dark" onClick={this.fillList}>carregar lita</button>
                                     </div>
                                 </form>
-                                {/* Tabela de orientadores cadastrado */}
-                                <p></p>
-                                
                             </div>
                         </div>
+                    </div>
+                    {/* Tabela de orientadores cadastrado */}
+                    <p></p>
+                    <h4 className="text-center">Lista de Orientadores</h4>
+                    <div class="container">
+                        <table class="table table-striped table-hover">
+                            <tbody>
+                                <tr>
+                                    <td className="text-center">Nome</td>
+                                    <td className="text-center">Email</td>
+                                </tr>
+                                {this.state.listOrientador && this.state.listOrientador.length > 0 ? this.state.listOrientador.map(data => (
+                                    <tr key={this.state.listOrientador.id}>
+                                        {/* <th scope="row">{data.id}</th> */}
+                                        <td className="text-center">{data.nomeCompleto}</td>
+                                        <td className="text-center">{data.email}</td>
+                                        <button class="btn btn-danger" onClick={() => this.delete(data)} >Deletar</button>
+                                        {/* <DataTable>
+                                            columns={this.columns}
+                                        </DataTable> */}
+                                    </tr>
+                                )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum orientador encontrado</td></tr>}
+                            </tbody>
+                        </table>
+                        <button class="btn btn-warning">editar</button>
+                        <button class="btn btn-danger" >Deletar</button>
                     </div>
                     <div className='row justify-content-end mt-auto'>
                     <div className='col-6 col-md-4 text-end'>
                         <img src={logo} className="img-fluid mb-3 me-2" style={{ 'maxWidth': '180px' }} alt="Logo da faculdade"></img>
                     </div>
                     </div>
-                    <div>
-                        <table class="table table-striped">
-                            <tbody>
-                                {this.state.listOrientador && this.state.listOrientador.length > 0 ? this.state.listOrientador.map(data => (
-                                    <tr key={this.state.listOrientador.id}>
-                                        {/* <th scope="row">{data.id}</th> */}
-                                        <td className="text-center">{data.nomeCompleto}</td>
-                                        <td className="text-center">{data.email}</td>
-                                    </tr>
-                                )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum orientador encontrado</td></tr>}
-                            </tbody>
-                        </table>
-                    </div>
+                    
                 </div>
             </div>
         )
