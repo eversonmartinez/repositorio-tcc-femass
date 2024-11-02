@@ -39,7 +39,7 @@ class TCC extends Component {
         selectedOrientador: null,
         resumo: '',
         tituloTcc: '',
-        toDeletionItem: null,
+        toDeleteItem: null,
         showModalDeletion: false,
         showModalEdit: false,
         showModalView: false,
@@ -673,7 +673,7 @@ class TCC extends Component {
                     <Modal.Header className='bg-dark text-white' closeButton>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Tem certeza que deseja excluir o trabalho <span className='fw-bold'>{this.state.toDeletionItem && this.state.toDeletionItem.titulo}</span>?</Modal.Body>
+                    <Modal.Body>Tem certeza que deseja excluir o trabalho {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.titulo}</span>}?</Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={() => this.closeModal('Deletion')}>
                         Cancelar
@@ -686,7 +686,7 @@ class TCC extends Component {
 
                 <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
                     <Modal.Header className='bg-dark text-white' closeButton>
-                    <Modal.Title>Resumo {this.state.toViewItem && this.state.toViewItem.titulo}</Modal.Title>
+                    <Modal.Title>Resumo {this.state.toViewItem && <>{this.state.toViewItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                     {this.state.toViewItem && <>
@@ -722,7 +722,7 @@ class TCC extends Component {
 
                 <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
                     <Modal.Header className='bg-dark text-white' closeButton>
-                    <Modal.Title>Editar {this.state.toEditItem && this.state.toEditItem.titulo}</Modal.Title>
+                    <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.submitTCCForm}>
                     <Modal.Body>
