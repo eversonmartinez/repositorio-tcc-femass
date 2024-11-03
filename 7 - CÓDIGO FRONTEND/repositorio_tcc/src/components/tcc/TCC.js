@@ -441,7 +441,7 @@ class TCC extends Component {
             <Navbar />
             
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Trabalhos de Conclusão de Curso</h1>
+                <h1 className='tittle tittleAfter'>Trabalhos de Conclusão de Curso</h1>
                 
                 <ToastContainer />
 
