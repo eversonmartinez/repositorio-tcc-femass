@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 import { ToastContainer, toast } from 'react-toastify';
 import { Button, Modal } from 'react-bootstrap';
+import Navbar from '../navbar/Navbar';
 
 
 function withNavigate(Component) {
@@ -323,6 +324,8 @@ class cadastroOrientador extends Component {
     render() {
         return (
             <div>
+            <Navbar />
+            <div>
                 <ToastContainer />
                 <div className='container-fluid d-flex flex-column justify-content-between' style={{ 'minHeight': '100vh' }}>
                     <div className='row justify-content-center' style={{ 'marginTop': '10vh' }}>
@@ -452,6 +455,7 @@ class cadastroOrientador extends Component {
                             </Modal.Footer>
                         </form>
                     </Modal>
+                </div>
                 </div>
             </div>
         )
