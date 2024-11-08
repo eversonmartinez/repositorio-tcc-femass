@@ -1,16 +1,20 @@
 package com.example.repositorioDeTcc.exception.handler;
 
-import com.example.repositorioDeTcc.exception.ExceptionResponse;
-import com.example.repositorioDeTcc.exception.ResourceNotFoundException;
-import com.example.repositorioDeTcc.exception.TooManyArgumentsException;
+import com.example.repositorioDeTcc.exception.*;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class CustomExceptionHandler{
@@ -43,5 +47,35 @@ public class CustomExceptionHandler{
     public final ResponseEntity<ExceptionResponse> handleTooManyArgumentsException(TooManyArgumentsException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(MustChangePasswordException.class)
+    public final ResponseEntity<ExceptionResponse> handleMustChangePasswordException(MustChangePasswordException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), "Must change password or not allowed", request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<ExceptionResponseValid> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex, WebRequest request) {
+
+        Map<String, String> fieldErrors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            fieldErrors.put(error.getField(), error.getDefaultMessage());
+        }
+
+        ExceptionResponseValid exceptionResponseValid = new ExceptionResponseValid(
+                new Date(),
+                "Validation failed",
+                request.getDescription(false),
+                fieldErrors
+        );
+
+        return new ResponseEntity<>(exceptionResponseValid, HttpStatus.BAD_REQUEST);
     }
 }

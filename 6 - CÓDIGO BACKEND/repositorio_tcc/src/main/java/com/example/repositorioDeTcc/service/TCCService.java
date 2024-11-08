@@ -11,6 +11,7 @@ import com.example.repositorioDeTcc.mapper.TCCMapper;
 import com.example.repositorioDeTcc.model.Aluno;
 import com.example.repositorioDeTcc.model.TCC;
 import com.example.repositorioDeTcc.repository.AlunoRepository;
+import com.example.repositorioDeTcc.repository.CategoriaRepository;
 import com.example.repositorioDeTcc.repository.OrientadorRepository;
 import com.example.repositorioDeTcc.repository.TCCRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class TCCService {
 
     @Autowired
     OrientadorRepository orientadorRepository;
+    
+    @Autowired
+    CategoriaRepository categoriaRepository;
 
     @Autowired
     TCCRepository repository;
@@ -77,5 +81,6 @@ public class TCCService {
         entity.setResumo(obj.getResumo());
         entity.setTitulo(obj.getTitulo());
         entity.setOrientador(orientadorRepository.findById(obj.getIdOrientador()).orElseThrow(() -> new ResourceNotFoundException(obj.getIdOrientador())));
+        entity.setCategoria(categoriaRepository.findById(obj.getIdCategoria()).orElseThrow(() -> new ResourceNotFoundException(obj.getIdCategoria())));
     }
 }

@@ -7,22 +7,22 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-
 @Data
-public class ExceptionResponse implements Serializable {
+public class ExceptionResponseValid {
     @Setter
     private Date timestamp;
     @Setter
     private String message;
     @Setter
     private String details;
+    private Map<String, String> fieldErrors;
 
-    public ExceptionResponse(Date timestamp, String message, String details) {
+    public ExceptionResponseValid(Date timestamp, String message, String details, Map<String, String> fieldErrors) {
         this.timestamp = timestamp;
         this.message = message;
         this.details = details;
+        this.fieldErrors = fieldErrors;
     }
-
     public Date getTimestamp() {
         return timestamp;
     }
@@ -35,4 +35,5 @@ public class ExceptionResponse implements Serializable {
         return details;
     }
 
+    public Map<String, String> getFieldErrors() { return fieldErrors; }
 }
