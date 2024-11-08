@@ -12,6 +12,8 @@ import PasswordChangeModal from './components/passwordChange/PasswordChangeModal
 import ChangePassword from './HOC/ChangePassword.js';
 import CadastroOrientador from './components/orientador/CadastroOrientador.js';
 import Users from './components/users/Users.js';
+import ResetPassword from './components/resetPassword/ResetPassword.js';
+import { useLocation } from 'react-router-dom';
 
 class App extends React.Component{
   
@@ -33,6 +35,9 @@ class App extends React.Component{
     const ProtectedUsers = (props) => (
       <ProtectedRoute component={() => <ChangePassword component={Users} {...props} />} />
     );
+    const ParametrizedResetPasword = (props) => (
+      <ResetPassword location={useLocation()} />
+    );
 
     return (
       <BrowserRouter>
@@ -46,6 +51,7 @@ class App extends React.Component{
             <Route exact path="/orientadores" element={<ProtectedOrientador />}></Route>
             <Route exact path="/tcc" element={<ProtectedTCC />}></Route>
             <Route exact path="/users" element={<ProtectedUsers />}></Route>
+            <Route exact path="/reset-password" element={<ParametrizedResetPasword />}></Route>
           </Routes>
           <PasswordChangeModal />
         </PasswordModalProvider>
