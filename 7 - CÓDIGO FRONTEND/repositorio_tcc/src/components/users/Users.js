@@ -130,7 +130,7 @@ class Users extends Component {
         }
 
         return passwordConfirmElement.checkValidity();
-      }
+    }
 
     validateForm = () => {
         const { completeName, login, email, password, passwordConfirm } = this.state;
