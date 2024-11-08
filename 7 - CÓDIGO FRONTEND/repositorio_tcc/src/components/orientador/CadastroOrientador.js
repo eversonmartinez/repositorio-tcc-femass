@@ -52,6 +52,9 @@ class cadastroOrientador extends Component {
                         
                     });
                     this.clearState()
+                    setTimeout(() => {
+                        this.fillList();
+                    }, 500);
                     return;
                 } else {
                     toast.error('Erro ao criar', {
@@ -67,9 +70,6 @@ class cadastroOrientador extends Component {
                 }
             })
             .catch(e => { console.error(e) })
-        setTimeout(() => {
-            this.fillList();
-        }, 2000);
     }
 
     state = {
