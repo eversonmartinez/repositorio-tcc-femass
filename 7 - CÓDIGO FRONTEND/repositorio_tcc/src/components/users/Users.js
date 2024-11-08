@@ -3,6 +3,7 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
+import '../../assets/css/tcc.css';
 
 class Users extends Component {
   
@@ -235,7 +236,7 @@ class Users extends Component {
             <Navbar />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Usuários</h1>
+                <h1 className='tittle tittleAfter'>Usuários</h1>
                 
                 <ToastContainer />
 
