@@ -25,14 +25,11 @@ public class TCCMapper {
     private OrientadorRepository orientadorRepository;
 
     @Autowired
-    private CategoriaRepository categoriaRepository;
-
-    @Autowired
     private SubcategoriaRepository subcategoriaRepository;
 
     public TCC fromTCCDTOToTCC(TCCDTO tccDTO){
         return new TCC(tccDTO.getTitulo(), alunoRepository.findById(tccDTO.getIdAluno()).get(), orientadorRepository.findById(tccDTO.getIdOrientador()).get(),
-                tccDTO.getIdCurso() ,categoriaRepository.findById(tccDTO.getIdCategoria()).get(),subcategoriaRepository.findById(tccDTO.getIdSubcategoria()).get(), tccDTO.getResumo());
+                tccDTO.getIdCurso(),subcategoriaRepository.findById(tccDTO.getIdSubcategoria()).get(), tccDTO.getResumo());
     }
 
     public TCCDTO toTCCDTO(TCC tcc){

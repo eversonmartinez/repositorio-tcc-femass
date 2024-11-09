@@ -33,9 +33,6 @@ public class TCCService {
     OrientadorRepository orientadorRepository;
     
     @Autowired
-    CategoriaRepository categoriaRepository;
-
-    @Autowired
     SubcategoriaRepository subcategoriaRepository;
 
     @Autowired
@@ -85,7 +82,6 @@ public class TCCService {
         entity.setResumo(obj.getResumo());
         entity.setTitulo(obj.getTitulo());
         entity.setOrientador(orientadorRepository.findById(obj.getIdOrientador()).orElseThrow(() -> new ResourceNotFoundException(obj.getIdOrientador())));
-        entity.setCategoria(categoriaRepository.findById(obj.getIdCategoria()).orElseThrow(() -> new ResourceNotFoundException(obj.getIdCategoria())));
         entity.setSubcategoria(subcategoriaRepository.findById(obj.getIdSubcategoria()).orElseThrow(()-> new ResourceNotFoundException(obj.getIdSubcategoria())));
     }
 }
