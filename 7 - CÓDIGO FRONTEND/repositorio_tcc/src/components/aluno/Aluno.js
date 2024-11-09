@@ -24,14 +24,26 @@ class Aluno extends Component {
           name: 'Nome',
           selector: user => user.nomeCompleto,
           sortable: true,
-          width: '35%'
+          width: '40%'
         },
         {
             name: 'Matricula',
             selector: user => user.matricula,
             sortable: true,
-             width: '25%'
+             width: '40%'
           },
+        //   {
+        //     name: 'Email',
+        //     selector: user => user.email,
+        //     sortable: true,
+        //      width: '25%'
+        //   },
+        //   {
+        //     name: 'Telefone',
+        //     selector: user => user.telefone,
+        //     sortable: true,
+        //      width: '25%'
+        //   },
         {
             name: 'Ações',
             cell: user => <>
@@ -39,7 +51,7 @@ class Aluno extends Component {
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto"><i className="bi bi-pencil"></i></button>
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado"><i className="bi bi-trash"></i></button>
             </>,
-             width: '10%'
+             width: '20%'
         }
     ];
 
@@ -168,17 +180,22 @@ class Aluno extends Component {
             return;
         }
 
-        let url = window.server + "/auth/register";
+        let url = window.server + "/alunos";
 
         const data = {
             "nomeCompleto": this.state.completeName,
-            "matricula": this.state.login,
+            "matricula": this.state.matricula,
+            "email": this.state.email,
+            "telefone": this.state.telefone,
         };
+
+        const token = sessionStorage.getItem('token');
 
         const requestOptions = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(data)
         };
@@ -290,11 +307,11 @@ class Aluno extends Component {
                             </div>
                             <div className="mb-3 row justify-content-center">
                                 <div className='col-12'>
-                                    <label htmlFor="login" className='required'>Matrícula</label>
-                                    <input type="text" className="form-control" id="login" name="login" required maxLength={11} onChange={this.handleChange}></input>
+                                    <label htmlFor="matricula" className='required'>Matrícula</label>
+                                    <input type="text" className="form-control" id="matricula" name="matricula" required maxLength={11} onChange={this.handleChange}></input>
                                 </div>
                             </div>
-                            {/* <div className="mb-3 row justify-content-center">  
+                            <div className="mb-3 row justify-content-center">  
                                 <div className='col-12'>
                                 <label htmlFor="email" className='required'>E-mail</label>
                                 <input type="email" className="form-control" id="email" name="email" required placeholder="email@email.com" onChange={this.handleChange}></input>
@@ -302,27 +319,11 @@ class Aluno extends Component {
                             </div>
                             <div className="mb-4 row justify-content-center">
                                 <div className='col-12'>
-                                <label htmlFor="password" className="col-form-label required">Senha</label>
-                                <input type="password" className="form-control" id="password" name="password" required onChange={this.handleChange}></input>
+                                <label htmlFor="password" className="col-form-label required">Telefone</label>
+                                <input type="text" className="form-control" id="telefone" name="telefone" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
-                            <div className="mb-4 row justify-content-center">
-                                <div className='col-12'>
-                                <label htmlFor="passwordConfirm" className="col-form-label required">Confirme a senha</label>
-                                <input type="password" className="form-control" id="passwordConfirm" name="passwordConfirm" onChange={this.handleChange} required></input>
-                                <div className="invalid-feedback">As senhas não conferem</div>
-                                </div>
-                            </div>
-                            <div className="px-3"> 
-                                <div className="form-check form-switch mb-3">
-                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
-                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha </label>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" value="" name="checkboxNotifyEmail" checked={this.state.checkboxNotifyEmail} onChange={this.handleChange}/>
-                                    <label class="form-check-label" htmlFor=""> Notificar por e-mail </label>
-                                </div>
-                            </div> */}
+
                             
                     </Modal.Body>
                     <Modal.Footer>
