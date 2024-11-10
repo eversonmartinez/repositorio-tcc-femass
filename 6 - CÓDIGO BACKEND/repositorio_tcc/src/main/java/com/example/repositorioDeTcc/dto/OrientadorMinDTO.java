@@ -16,6 +16,7 @@ public class OrientadorMinDTO {
     private UUID id;
     private String nomeCompleto;
     private String cpf;
+    private String email;
 
     public OrientadorMinDTO(Orientador entity){
         BeanUtils.copyProperties(entity, this);
