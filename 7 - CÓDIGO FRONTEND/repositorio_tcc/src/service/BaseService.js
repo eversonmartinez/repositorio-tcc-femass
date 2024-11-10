@@ -23,6 +23,20 @@ export class BaseService {
             return Promise.reject(error);
         });
 
+        axiosInstance.interceptors.response.use((response) => {
+            return response;
+        }, async (error) => {
+            // const originalConfig = error.config;
+            // console.log(error.response.status);
+            if (error.response.status === 401) {
+                //Fazer o refresh token
+                //Se o refresh token falhar, redirecionar para a tela de login
+                sessionStorage.removeItem("token");
+                window.location.reload();
+            }
+            return Promise.reject(error);
+        });
+    }
 
     listAll() {
         return axiosInstance.get(this.url);
