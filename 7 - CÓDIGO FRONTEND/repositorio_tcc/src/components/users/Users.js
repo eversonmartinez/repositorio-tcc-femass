@@ -11,6 +11,13 @@ class Users extends Component {
         filteredData: [],
         checkboxChangePassword: true,
         checkboxNotifyEmail: true,
+        toDeleteItem: null,
+        toViewItem: null,
+        toEditItem: null,
+        showModalDeletion: false,
+        showModalEdit: false,
+        showModalRegistration: false,
+        showModalView: false,
         completeName: '',
         login: '',
         email: '',
@@ -46,9 +53,9 @@ class Users extends Component {
         {
             name: 'Ações',
             cell: user => <>
-                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto"><i className="bi bi-eye"></i></button>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto" onClick={() => this.beginView(user)}><i className="bi bi-eye"></i></button>
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto"><i className="bi bi-pencil"></i></button>
-                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado"><i className="bi bi-trash"></i></button>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(user)}><i className="bi bi-trash"></i></button>
             </>,
              width: '10%'
         }
@@ -148,7 +155,10 @@ class Users extends Component {
             password: '',
             passwordConfirm: '',
             checkboxChangePassword: true,
-            checkboxNotifyEmail: true
+            checkboxNotifyEmail: true,
+            toDeleteItem: null,
+            toViewItem: null,
+            toEditItem: null,
         });
     }
 
@@ -223,6 +233,87 @@ class Users extends Component {
             }
         })
         .catch(e => { console.error(e) });
+    }
+
+    delete = () => {
+
+        console.log(this.state.toDeleteItem)
+        
+        const url = window.server + "/users/" + this.state.toDeleteItem.id;
+
+        const token = sessionStorage.getItem('token');
+
+        console.log(token)
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    this.fillList();
+                    this.setState({ showModalDeletion: false });
+                    toast.success('Usuário excluído!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                }
+                else{
+                    toast.error('Não foi possível excluir', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            });
+    }
+
+    beginDeletion = (usuarios) => {
+        this.setState({ toDeleteItem: usuarios, showModalDeletion: true });
+        // console.log(this.state.showModalDeletion)
+	}
+
+    beginView = (aluno) => { 
+
+        const url = window.server + "/users/" + aluno.id;
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    return response.json();
+                } else{
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            }).then((data) => {
+                this.setState({ toViewItem: data, showModalView: true });
+            })
+            .catch((error) => {
+            });
     }
 
     componentDidMount() {
@@ -342,6 +433,53 @@ class Users extends Component {
                         </Button>
                     </Modal.Footer>
                     </form>
+                </Modal>
+
+                <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Confirmar Exclusão</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Tem certeza que deseja excluir o aluno {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.nome}</span>}?</Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.closeModal('Deletion')}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={this.delete}>
+                        Confirmar
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.nome}</>}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    {this.state.toViewItem && <>
+                            <div>
+                                <h5>Nome:</h5>
+                                <p>{this.state.toViewItem.nomeCompleto}</p>
+                            </div>
+                            <div>
+                                <h5>Matrícula:</h5>
+                                <p>{this.state.toViewItem.role}</p>
+                            </div>
+                            <div>
+                                <h5>Email:</h5>
+                                <p>{this.state.toViewItem.email}</p>
+                            </div>
+                            <div>
+                                <h5>Telefone:</h5>
+                                <p>{this.state.toViewItem.matricula}</p>
+                            </div>
+                            </>
+                    }
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.closeModal('View')}>
+                        Fechar
+                    </Button>
+                    </Modal.Footer>
                 </Modal>
                 
             </div>
