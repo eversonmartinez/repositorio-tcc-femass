@@ -32,14 +32,14 @@ public class TCC implements Serializable {
     //mudar para relacionamente com a classe curso quando essa existir
     @Column(name = "id_curso")
     private Integer curso;
-    @ManyToOne(optional = false)
-    @JoinColumn(name="id_Categoria", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name="id_Categoria", referencedColumnName = "id")
     private Categoria categoria;
 
     @Column
     private String resumo;
 
-    public TCC(String titulo, Aluno aluno, Orientador orientador, Integer curso,Categoria categoria, String resumo){
+    public TCC(String titulo, Aluno aluno, Orientador orientador, Integer curso, Categoria categoria, String resumo){
         this.titulo = titulo;
         this.aluno = aluno;
         this.orientador = orientador;

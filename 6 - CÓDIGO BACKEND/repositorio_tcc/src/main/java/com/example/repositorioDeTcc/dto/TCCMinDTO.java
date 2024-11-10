@@ -31,6 +31,11 @@ public class TCCMinDTO {
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
         this.idCurso = entity.getCurso();
-        this.idCategoria = entity.getCategoria().getId();
+        // Verifica se a categoria é nula antes de acessar seus atributos
+        if (entity.getCategoria() != null) {
+            this.idCategoria = entity.getCategoria().getId();
+        } else {
+            this.idCategoria = null; // Define como null se a categoria for nula
+        }
     }
 }
