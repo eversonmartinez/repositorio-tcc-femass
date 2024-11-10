@@ -7,6 +7,9 @@ import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TCCService } from '../../service/TCCService';
+import { AlunoService } from '../../service/AlunoService';
+import { OrientadorService } from '../../service/OrientadorService';
 
 function withNavigate(Component) {
     return (props) => {
@@ -48,6 +51,10 @@ class TCC extends Component {
         filterAluno: '',
         filterOrientador: ''
     }
+
+    tccService = new TCCService();
+    alunoService = new AlunoService();
+    orientadorService = new OrientadorService();
 
     columns = [
         {
@@ -134,21 +141,8 @@ class TCC extends Component {
     };
 
     fillList = () => {
-        const url = window.server + "/tcc";
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
-            .then((response) => response.json())
-                .then((data) => this.setState({tccs: data, filteredItems: data}));
+        this.tccService.listAll()
+            .then((response) => this.setState({tccs: response.data, filteredItems: response.data}));
     }
 
     backToHome = () => {
@@ -156,46 +150,20 @@ class TCC extends Component {
     } 
 
     fillOptionsAlunos = () => {
-        const url = window.server + "/alunos";
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
-            .then((response) => response.json())
-                .then((data) => {
-                    const optionsAlunos = data.map(aluno => ({
-                        value: aluno.id,
-                        label: aluno.nomeCompleto
-                    }));
-                    this.setState({ optionsAlunos });
-            })
+        this.alunoService.listAll()
+            .then((response) => {
+                const optionsAlunos = response.data.map(aluno => ({
+                    value: aluno.id,
+                    label: aluno.nomeCompleto
+                }));
+                this.setState({ optionsAlunos });
+            });
     }
 
     fillOptionsOrientadores = () => {
-        const url = window.server + "/orientadores";
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
-            .then((response) => response.json())
-                .then((data) => {
-                    const optionsOrientadores = data.map(orientador => ({
+        this.orientadorService.listAll()
+            .then((response) => {
+                    const optionsOrientadores = response.data.map(orientador => ({
                         value: orientador.id,
                         label: orientador.nomeCompleto
                     }));
@@ -235,10 +203,6 @@ class TCC extends Component {
         
         if(!this.validateForm()) return;
 
-        let url = window.server + "/tcc";
-
-        const token = sessionStorage.getItem('token');
-
         let data = {
             "titulo": this.state.tituloTcc,
             "idAluno": this.state.selectedAluno.value,
@@ -250,29 +214,23 @@ class TCC extends Component {
             data.resumo = this.state.resumo;
         }
 
-        let requestOptions = {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        };
-
-        if(this.state.toEditItem){
-            requestOptions.method = 'PUT';
-            url+= "/" + this.state.toEditItem.id;
+        var request = null;
+        if(!this.state.toEditItem){
+            request = this.tccService.insert(data);
+        } else {
+            request = this.tccService.update(this.state.toEditItem.id, data);
         }
 
-        fetch(url, requestOptions)
+        // .then(response => {
+        //     if (response.ok) {
+        //         return response.json();
+        //     } else {
+        //         throw new Error('Erro na requisição: ' + response.status);
+        //     }
+        // })
+        // .then(data => {
+        request
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Erro na requisição: ' + response.status);
-            }
-        })
-        .then(data => {
             if(this.state.toEditItem){
                 this.setState({showModalEdit: false})
                 toast.success('TCC atualizado!', {
@@ -319,21 +277,8 @@ class TCC extends Component {
 	}
 
     delete = () => {
-        const url = window.server + "/tcc/" + this.state.toDeleteItem.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
-            .then((response) => {
-                if(response.ok) {
+        this.tccService.delete(this.state.toDeleteItem.id)
+            .then(response => {
                     this.fillList();
                     this.setState({ showModalDeletion: false });
                     toast.success('TCC excluído!', {
@@ -345,20 +290,17 @@ class TCC extends Component {
                         draggable: true,
                         progress: undefined,
                       });
-                }
-                else{
-                    toast.error('Não foi possível excluir', {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                      });
-                    throw new Error('Erro na requisição: ' + response.status);
-                }
-            });
+            }).catch((error) => {
+                toast.error('Não foi possível excluir', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    });
+            }); 
     }
 
     closeModal = (operationName) => {
