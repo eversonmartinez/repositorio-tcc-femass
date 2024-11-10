@@ -33,8 +33,8 @@ public class TCC implements Serializable {
     @Column(name = "id_curso")
     private Integer curso;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(name="id_Subcategoria", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name="id_Subcategoria", referencedColumnName = "id")
     private Subcategoria subcategoria;
 
     @Column
