@@ -142,7 +142,18 @@ class TCC extends Component {
 
     fillList = () => {
         this.tccService.listAll()
-            .then((response) => this.setState({tccs: response.data, filteredItems: response.data}));
+            .then((response) => this.setState({tccs: response.data, filteredItems: response.data}))
+            .catch((error) => {
+                toast.error('Erro ao carregar os dados', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+            });
     }
 
     backToHome = () => {
