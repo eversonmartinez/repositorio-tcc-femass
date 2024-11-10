@@ -3,6 +3,7 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
+import '../../assets/css/tcc.css';
 
 class Users extends Component {
   
@@ -18,7 +19,7 @@ class Users extends Component {
         showModalEdit: false,
         showModalRegistration: false,
         showModalView: false,
-        completeName: '',
+        nomeCompleto: '',
         login: '',
         email: '',
         password: '',
@@ -186,7 +187,7 @@ class Users extends Component {
         let url = window.server + "/auth/register";
 
         const data = {
-            "nomeCompleto": this.state.completeName,
+            "nomeCompleto": this.state.nomeCompleto,
             "matricula": this.state.login,
             "email": this.state.email,
             "password": this.state.password,
@@ -201,19 +202,36 @@ class Users extends Component {
             body: JSON.stringify(data)
         };
 
+        if(this.state.toEditItem){
+            requestOptions.method = 'PUT';
+            url+= "/" + this.state.toEditItem.id;
+        }
+
         fetch(url, requestOptions)
         .then((response) => {
             if (response.status === 200) {
                 this.closeModal('Registration');
-                toast.success('Usuário criado!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                if(this.state.toEditItem){
+                    toast.success('Usuário atualizado!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }else{
+                    toast.success('Usuário criado!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
                 setTimeout(() => {
                 }, 2000);
                 this.clearState();
@@ -229,6 +247,7 @@ class Users extends Component {
                 draggable: true,
                 progress: undefined,
             });
+            this.clearState();
             throw new Error('Falha na requisição: ' + response.status);
             }
         })
@@ -326,7 +345,7 @@ class Users extends Component {
             <Navbar />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Usuários</h1>
+                <h1 className='tittle tittleAfter'>Usuários</h1>
                 
                 <ToastContainer />
 
@@ -480,6 +499,43 @@ class Users extends Component {
                         Fechar
                     </Button>
                     </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
+                    </Modal.Header>
+                    <form onSubmit={this.registerForm}>
+                    <Modal.Body>
+                        {this.state.toEditItem && <>
+                            <div className="modal-body">
+                                <div className="container">
+                                        <div className="mb-3 row">
+                                            <div className="col-12">
+                                                <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Nome</label>
+                                                <input type="text" className="form-control" name="nomeCompleto" id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required/>
+                                            </div>
+                                            <div className="col-12">
+                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Email</label>
+                                                <textarea rows="3" className='form-control' style={{resize: "none"}} name="email" onChange={this.handleChange} value={this.state.email}></textarea>
+                                            </div>
+                                            {/* <div className="col-12">
+                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Role</label>
+                                                <textarea rows="3" className='form-control' style={{resize: "none"}} name="telefone" onChange={this.handleChange} value={this.state.telefone}></textarea>
+                                            </div> */}
+                                        </div>
+                                </div>
+                            </div>
+                        </>
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeModal('Edit')}>
+                            Fechar
+                        </Button>
+                        <button type='submit' className="btn btn-primary">Salvar</button>
+                    </Modal.Footer>
+                    </form>
                 </Modal>
                 
             </div>

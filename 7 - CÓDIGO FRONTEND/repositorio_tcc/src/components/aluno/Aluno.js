@@ -94,6 +94,10 @@ class Aluno extends Component {
         }));
     }
 
+    backToHome = () => {
+        window.location.href = '/home';
+    } 
+
     handleChange = (event) => {
         if(event.target.name.startsWith('filter')) this.applyFilters();
         this.setState({ [event.target.name]: event.target.value });
@@ -410,8 +414,9 @@ class Aluno extends Component {
             <Navbar />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Alunos</h1>
-                
+                {/* <h1 className='display-6 fw-bold text-decoration-underline p-3'>Alunos</h1> */}
+                <button className='btn btn-primary m-3' onClick={this.backToHome}><i className='bi bi-arrow-left'></i></button>
+                <h1 className='tittle tittleAfter'>Alunos</h1>
                 <ToastContainer />
 
                 <div className='col-12 col-md-3 ms-5'>
@@ -586,6 +591,17 @@ class Aluno extends Component {
                 </Modal>
                 
             </div>
+            {/* <table className="table table-bordered table-hover" id="data-table">
+                <tbody>
+                    {this.state.alunos && this.state.alunos.length > 0 ? this.state.alunos.map(aluno => (
+                    <tr key={aluno.id}>
+                        <th scope="row">{aluno.id}</th>
+                        <td>{aluno.nomeCompleto}</td>
+                        <td className="text-center">{aluno.matricula}</td>
+                    </tr>
+                    )) : null}
+                </tbody>
+            </table> */}
         </div>
         )
   }
