@@ -39,9 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(
-                                        "/auth/login",
-                                        "/auth/register",
-                                        "/auth/changePassword"
+                                        "/auth/*"
                                 ).permitAll()
                                 .requestMatchers("/api/v1/auth/**",
                                         "/v3/api-docs/**",

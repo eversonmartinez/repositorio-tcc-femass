@@ -45,6 +45,7 @@ class Aluno extends Component {
         return (
         <div>
             <button className='btn btn-primary m-3' onClick={this.backToHome}><i className='bi bi-arrow-left'></i></button>
+            <h1 className='tittle tittleAfter'>Alunos</h1>
             <table className="table table-bordered table-hover" id="data-table">
                 <tbody>
                     {this.state.alunos && this.state.alunos.length > 0 ? this.state.alunos.map(aluno => (

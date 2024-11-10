@@ -6,6 +6,7 @@ import com.example.repositorioDeTcc.exception.TooManyArgumentsException;
 import com.example.repositorioDeTcc.model.Role;
 import com.example.repositorioDeTcc.model.User;
 import com.example.repositorioDeTcc.repository.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +18,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AuthService {
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     TokenService tokenService;
-
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
+    @Autowired
+    MailService mailService;
 
     public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO) {
 
@@ -74,15 +75,18 @@ public class AuthService {
         if(userRepository.findByEmail(registerUserDTO.email()) != null) return ResponseEntity.badRequest().body(new LoginErroDTO("Email Already taken"));
         if(userRepository.findByMatricula(registerUserDTO.matricula()) !=null) return ResponseEntity.badRequest().body(new LoginErroDTO("Matricula already taken"));
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(registerUserDTO.password());
+        String encryptedPassword = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
         String role = "USER";
         User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.valueOf(role));
 
-        userRepository.save(newUser);
+        User persistedUser = userRepository.save(newUser);
+
+        var token = tokenService.generateToken(persistedUser);
+
+        mailService.sendWelcomeEmail(registerUserDTO, token);
 
         return ResponseEntity.ok().build();
     }
-
 
     public ResponseEntity<?> changePassword(ChangePasswordRequestDTO request, Principal connectedUser) {
         var user = ((User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal());
@@ -101,4 +105,41 @@ public class AuthService {
         return ResponseEntity.ok(new LoginResponseDTO(token));
 
     }
+
+    public ResponseEntity<?> sendMailReset(SendMailResetRequestDTO request) {
+        var user = userRepository.findByEmail(request.email());
+        if (user == null){
+            return ResponseEntity.ok().build();
+        }
+        var token = tokenService.generateSingleToken((User) user);
+        mailService.sendRecoverPassword(((User) user).getNomeCompleto(), request.email(),token);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> resetPassword(ResetPasswordDTO request,String token) {
+        try {
+            tokenService.validateToken(token);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new LoginErroDTO("Invalid token"));
+        }
+        if(!request.newPassword().equals(request.confirmPassword())){
+            throw new IllegalStateException("Password do not match");
+        }
+        User user = (User) userRepository.findByEmail(tokenService.getClaimFromToken(token, "sub"));
+        if(!userRepository.findByUsedToken(token).isEmpty()){
+            throw new IllegalStateException("Token already used");
+        }
+        if (user != null) {
+            String encryptedPassword = new BCryptPasswordEncoder().encode(request.newPassword());
+            user.setPassword(encryptedPassword);
+            userRepository.insertToken(token);
+            user.setMustChangePassword(false);
+            userRepository.save(user);
+            token = tokenService.generateToken(user);
+            return ResponseEntity.ok(new LoginResponseDTO(token));
+        }else {
+            throw new IllegalStateException("User not found");
+        }
+    }
+
 }

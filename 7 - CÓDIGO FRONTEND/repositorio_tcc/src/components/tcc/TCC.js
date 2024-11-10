@@ -39,7 +39,7 @@ class TCC extends Component {
         selectedOrientador: null,
         resumo: '',
         tituloTcc: '',
-        toDeletionItem: null,
+        toDeleteItem: null,
         showModalDeletion: false,
         showModalEdit: false,
         showModalView: false,
@@ -439,8 +439,9 @@ class TCC extends Component {
         return (
         <div>
             <Navbar />
+            
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Trabalhos de Conclusão de Curso</h1>
+                <h1 className='tittle tittleAfter'>Trabalhos de Conclusão de Curso</h1>
                 
                 <ToastContainer />
 
@@ -572,28 +573,160 @@ class TCC extends Component {
                 </div>
             </div>
 
-            {/* <!-- Modal Body -->
-            <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard --> */}
-            <div className="modal fade large-modal" id="insertionModal" tabIndex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
-                <div
-                    className="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl"
-                    role="document"
-                >
-                    <div className="modal-content">
-                        <div className="modal-header bg-dark">
-                            <h5 className="modal-title text-white" id="modalTitleId">
-                                Novo TCC
-                            </h5>
-                            <button
-                                type="button"
-                                className="btn-close text-white"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                                style={{filter: 'invert(1)'}}
-                                onClick={this.clearState}
-                            ></button>
+            <div className='modals'>
+                {/* <!-- Modal Body -->
+                <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard --> */}
+                <div className="modal fade large-modal" id="insertionModal" tabIndex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                    <div
+                        className="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl"
+                        role="document"
+                    >
+                        <div className="modal-content">
+                            <div className="modal-header bg-dark">
+                                <h5 className="modal-title text-white" id="modalTitleId">
+                                    Novo TCC
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close text-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                    style={{filter: 'invert(1)'}}
+                                    onClick={this.clearState}
+                                ></button>
+                            </div>
+                            <form onSubmit={this.submitTCCForm}>
+                                <div className="modal-body">
+                                    <div className="container">
+                                            <div className="mb-3 row">
+                                                <div className="col-12">
+                                                    <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Título</label>
+                                                    <input type="text" className="form-control" name="tituloTcc" id="tituloTcc" onChange={this.handleChange} value={this.state.tituloTcc} required/>
+                                                </div>
+                                                <div className="col-12">
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Resumo</label>
+                                                    <textarea rows="3" className='form-control' style={{resize: "none"}} name="resumo" onChange={this.handleChange} value={this.state.resumo}></textarea>
+                                                </div>
+                                                <div className="col-12">
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
+                                                    <Select
+                                                        className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
+                                                        classNamePrefix="select"
+                                                        defaultValue={defaultSelectOption}
+                                                        isClearable={true}
+                                                        isSearchable={true}
+                                                        name="selectCurso"
+                                                        options={this.state.optionsCursos}
+                                                        noOptionsMessage={() => "Não há cursos cadastrados"}
+                                                        onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption, isCursoInvalid: !selectedOption })}
+                                                        value={this.state.selectedCurso}
+                                                    />
+                                                    {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
+                                                </div>
+                                                <div className="col-12">
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Aluno</label>
+                                                    <Select
+                                                        className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
+                                                        classNamePrefix="select"
+                                                        defaultValue={defaultSelectOption}
+                                                        // isLoading={isLoading}
+                                                        isClearable={true}
+                                                        isSearchable={true}
+                                                        name="selectAluno"
+                                                        options={this.state.optionsAlunos}
+                                                        noOptionsMessage={() => "Não há alunos cadastrados"}
+                                                        onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption, isAlunoInvalid: !selectedOption })}
+                                                        value={this.state.selectedAluno}
+                                                    />
+                                                    {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
+                                                </div>
+                                                <div className="col-12">
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
+                                                    <Select
+                                                        className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
+                                                        classNamePrefix="select"
+                                                        defaultValue={defaultSelectOption}
+                                                        // isLoading={isLoading}
+                                                        isClearable={true}
+                                                        isSearchable={true}
+                                                        name="selectOrientador"
+                                                        options={this.state.optionsOrientadores}
+                                                        noOptionsMessage={() => "Não há orientadores cadastrados"}
+                                                        value={this.state.selectedOrientador}
+                                                        onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
+                                                    />
+                                                    {this.state.isOrientadorInvalid && <div className="invalid-feedback">Por favor, selecione um orientador.</div>}
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" id="btnCloseModal" className="btn btn-secondary" data-bs-dismiss="modal" onClick={this.clearState}>Fechar</button>
+                                    <button type="submit" className="btn btn-primary">Salvar</button>
+                                </div>
+                            </form>
                         </div>
-                        <form onSubmit={this.submitTCCForm}>
+                    </div>
+                </div>
+
+                <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Confirmar Exclusão</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Tem certeza que deseja excluir o trabalho {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.titulo}</span>}?</Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.closeModal('Deletion')}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={this.delete}>
+                        Confirmar
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Resumo {this.state.toViewItem && <>{this.state.toViewItem.titulo}</>}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    {this.state.toViewItem && <>
+                            <div>
+                                <h5>Título:</h5>
+                                <p>{this.state.toViewItem.titulo}</p>
+                            </div>
+                            <div>
+                                <h5>Resumo:</h5>
+                                <p>{this.state.toViewItem.resumo}</p>
+                            </div>
+                            <div>
+                                <h5>Autor:</h5>
+                                <p>{this.state.toViewItem.idAluno}</p>
+                            </div>
+                            <div>
+                                <h5>Autor:</h5>
+                                <p>{this.state.toViewItem.idOrientador}</p>
+                            </div>
+                            <div>
+                                <h5>Curso:</h5>
+                                <p>{this.state.toViewItem.idCurso}</p>
+                            </div>
+                            </>
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.closeModal('View')}>
+                        Fechar
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
+                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
+                    </Modal.Header>
+                    <form onSubmit={this.submitTCCForm}>
+                    <Modal.Body>
+                        {this.state.toEditItem && <>
                             <div className="modal-body">
                                 <div className="container">
                                         <div className="mb-3 row">
@@ -608,35 +741,26 @@ class TCC extends Component {
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
                                                 <Select
+                                                    isDisabled
                                                     className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
                                                     classNamePrefix="select"
-                                                    defaultValue={defaultSelectOption}
-                                                    isClearable={true}
-                                                    isSearchable={true}
                                                     name="selectCurso"
+                                                    defaultValue={defaultSelectOption}
                                                     options={this.state.optionsCursos}
-                                                    noOptionsMessage={() => "Não há cursos cadastrados"}
-                                                    onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption, isCursoInvalid: !selectedOption })}
                                                     value={this.state.selectedCurso}
                                                 />
-                                                {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
                                             </div>
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Aluno</label>
                                                 <Select
+                                                    isDisabled
                                                     className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
                                                     classNamePrefix="select"
-                                                    defaultValue={defaultSelectOption}
-                                                    // isLoading={isLoading}
-                                                    isClearable={true}
-                                                    isSearchable={true}
                                                     name="selectAluno"
+                                                    defaultValue={defaultSelectOption}
                                                     options={this.state.optionsAlunos}
-                                                    noOptionsMessage={() => "Não há alunos cadastrados"}
-                                                    onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption, isAlunoInvalid: !selectedOption })}
                                                     value={this.state.selectedAluno}
                                                 />
-                                                {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
                                             </div>
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
@@ -658,145 +782,18 @@ class TCC extends Component {
                                         </div>
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" id="btnCloseModal" className="btn btn-secondary" data-bs-dismiss="modal" onClick={this.clearState}>Fechar</button>
-                                <button type="submit" className="btn btn-primary">Salvar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
-                <Modal.Header className='bg-dark text-white' closeButton>
-                <Modal.Title>Confirmar Exclusão</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Tem certeza que deseja excluir o trabalho <span className='fw-bold'>{this.state.toDeletionItem && this.state.toDeletionItem.titulo}</span>?</Modal.Body>
-                <Modal.Footer>
-                <Button variant="secondary" onClick={() => this.closeModal('Deletion')}>
-                    Cancelar
-                </Button>
-                <Button variant="primary" onClick={this.delete}>
-                    Confirmar
-                </Button>
-                </Modal.Footer>
-            </Modal>
-
-            <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
-                <Modal.Header className='bg-dark text-white' closeButton>
-                <Modal.Title>Resumo {this.state.toViewItem && this.state.toViewItem.titulo}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                {this.state.toViewItem && <>
-                        <div>
-                            <h5>Título:</h5>
-                            <p>{this.state.toViewItem.titulo}</p>
-                        </div>
-                        <div>
-                            <h5>Resumo:</h5>
-                            <p>{this.state.toViewItem.resumo}</p>
-                        </div>
-                        <div>
-                            <h5>Autor:</h5>
-                            <p>{this.state.toViewItem.idAluno}</p>
-                        </div>
-                        <div>
-                            <h5>Autor:</h5>
-                            <p>{this.state.toViewItem.idOrientador}</p>
-                        </div>
-                        <div>
-                            <h5>Curso:</h5>
-                            <p>{this.state.toViewItem.idCurso}</p>
-                        </div>
                         </>
-                    }
-                </Modal.Body>
-                <Modal.Footer>
-                <Button variant="secondary" onClick={() => this.closeModal('View')}>
-                    Fechar
-                </Button>
-                </Modal.Footer>
-            </Modal>
-
-            <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
-                <Modal.Header className='bg-dark text-white' closeButton>
-                <Modal.Title>Editar {this.state.toEditItem && this.state.toEditItem.titulo}</Modal.Title>
-                </Modal.Header>
-                <form onSubmit={this.submitTCCForm}>
-                <Modal.Body>
-                    {this.state.toEditItem && <>
-                        <div className="modal-body">
-                            <div className="container">
-                                    <div className="mb-3 row">
-                                        <div className="col-12">
-                                            <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Título</label>
-                                            <input type="text" className="form-control" name="tituloTcc" id="tituloTcc" onChange={this.handleChange} value={this.state.tituloTcc} required/>
-                                        </div>
-                                        <div className="col-12">
-                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Resumo</label>
-                                            <textarea rows="3" className='form-control' style={{resize: "none"}} name="resumo" onChange={this.handleChange} value={this.state.resumo}></textarea>
-                                        </div>
-                                        <div className="col-12">
-                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
-                                            <Select
-                                                isDisabled
-                                                className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
-                                                classNamePrefix="select"
-                                                name="selectCurso"
-                                                options={this.state.optionsCursos}
-                                                value={this.state.selectedCurso}
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Aluno</label>
-                                            <Select
-                                                isDisabled
-                                                className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
-                                                classNamePrefix="select"
-                                                name="selectAluno"
-                                                options={this.state.optionsAlunos}
-                                                value={this.state.selectedAluno}
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
-                                            <Select
-                                                className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
-                                                classNamePrefix="select"
-                                                defaultValue={defaultSelectOption}
-                                                // isLoading={isLoading}
-                                                isClearable={true}
-                                                isSearchable={true}
-                                                name="selectOrientador"
-                                                options={this.state.optionsOrientadores}
-                                                noOptionsMessage={() => "Não há orientadores cadastrados"}
-                                                value={this.state.selectedOrientador}
-                                                onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
-                                            />
-                                            {this.state.isOrientadorInvalid && <div className="invalid-feedback">Por favor, selecione um orientador.</div>}
-                                        </div>
-                                    </div>
-                            </div>
-                        </div>
-                    </>
-                    }
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => this.closeModal('Edit')}>
-                        Fechar
-                    </Button>
-                    <button type='submit' className="btn btn-primary">Salvar</button>
-                </Modal.Footer>
-                </form>
-            </Modal>
-            
-            {/* <!-- Optional: Place to the bottom of scripts -->
-            <script>
-                const myModal = new bootstrap.Modal(
-                    document.getElementById("modalId"),
-                    options,
-                );
-            </script> */}
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeModal('Edit')}>
+                            Fechar
+                        </Button>
+                        <button type='submit' className="btn btn-primary">Salvar</button>
+                    </Modal.Footer>
+                    </form>
+                </Modal>
+            </div>  
             
         </div>
         )
