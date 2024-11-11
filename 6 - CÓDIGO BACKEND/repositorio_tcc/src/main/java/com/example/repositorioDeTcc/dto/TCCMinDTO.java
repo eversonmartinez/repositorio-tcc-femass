@@ -21,7 +21,7 @@ public class TCCMinDTO {
     private UUID idOrientador;
     private String nomeCompletoOrientador;
     private Integer idCurso;
-    private UUID idCategoria;
+    private UUID idSubcategoria;
 
     public TCCMinDTO(TCC entity){
         this.id = entity.getId();
@@ -31,6 +31,7 @@ public class TCCMinDTO {
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
         this.idCurso = entity.getCurso();
-        this.idCategoria = entity.getCategoria().getId();
+        if(entity.getSubcategoria() != null)
+            this.idSubcategoria = entity.getSubcategoria().getId();
     }
 }

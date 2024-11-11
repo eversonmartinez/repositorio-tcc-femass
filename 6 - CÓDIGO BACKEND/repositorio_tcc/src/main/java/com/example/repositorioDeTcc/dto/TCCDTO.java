@@ -20,7 +20,7 @@ public class TCCDTO {
     private UUID idOrientador;
     private String nomeCompletoOrientador;
     private Integer idCurso;
-    private UUID idCategoria;
+    private UUID idSubcategoria;
     private String resumo;
 
     public TCCDTO(TCC entity){
@@ -31,7 +31,8 @@ public class TCCDTO {
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
         this.idCurso = entity.getCurso();
-        this.idCategoria = entity.getCategoria().getId();
+        if(entity.getSubcategoria() != null)
+            this.idSubcategoria = entity.getSubcategoria().getId();
         this.resumo = entity.getResumo();
     }
 }
