@@ -55,7 +55,7 @@ class Users extends Component {
             name: 'Ações',
             cell: user => <>
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Visualizar Instituto" onClick={() => this.beginView(user)}><i className="bi bi-eye"></i></button>
-                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto"><i className="bi bi-pencil"></i></button>
+                <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto" onClick={() => this.beginEdit(user)}><i className="bi bi-pencil"></i></button>
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(user)}><i className="bi bi-trash"></i></button>
             </>,
              width: '10%'
@@ -169,6 +169,7 @@ class Users extends Component {
     }
 
     registerForm = (event) => {
+        
         event.preventDefault();
         
         if(!this.validateForm()) {
@@ -263,6 +264,7 @@ class Users extends Component {
         const token = sessionStorage.getItem('token');
 
         console.log(token)
+        console.log(url)
 
         const requestOptions = {
             method: 'DELETE',
@@ -334,6 +336,50 @@ class Users extends Component {
             .catch((error) => {
             });
     }
+
+    beginEdit = (aluno) => { 
+
+        const url = window.server + "/alunos/" + aluno.id;
+
+        console.log(url)
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    return response.json();
+                } else{
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            }).then((data) => { 
+                // if (data.resumo === null) data.resumo = '';
+                this.setState({ 
+                    toEditItem: data,
+                    showModalEdit: true,
+                    nomeCompleto: data.nomeCompleto,
+                    email: data.email,
+                    // telefone: data.telefone,
+                    // tituloTcc: data.titulo,
+                    // resumo: data.resumo,
+                    // // selectedCurso: { value: data.idCurso, label: data.idCurso },
+                    // // selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
+                    // // selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } 
+                
+                });
+            })
+            .catch((error) => {
+            });
+    }
+
 
     componentDidMount() {
         this.fillList();
