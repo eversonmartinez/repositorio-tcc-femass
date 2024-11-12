@@ -105,6 +105,7 @@ class Users extends Component {
     };
 
     fillList = () => {
+        
         const url = window.server + "/users";
 
         const token = sessionStorage.getItem('token');
@@ -141,8 +142,8 @@ class Users extends Component {
     }
 
     validateForm = () => {
-        const { completeName, login, email, password, passwordConfirm } = this.state;
-        if (!completeName || !login || !email || !password || !passwordConfirm) {
+        const { nomeCompleto, login, email, password, passwordConfirm } = this.state;
+        if (!nomeCompleto || !login || !email || !password || !passwordConfirm) {
             return false;
         }
         return this.validatePassword();
@@ -150,7 +151,7 @@ class Users extends Component {
 
     clearState = () => {
         this.setState({
-            completeName: '',
+            nomeCompleto: '',
             login: '',
             email: '',
             password: '',
@@ -203,36 +204,19 @@ class Users extends Component {
             body: JSON.stringify(data)
         };
 
-        if(this.state.toEditItem){
-            requestOptions.method = 'PUT';
-            url+= "/" + this.state.toEditItem.id;
-        }
-
         fetch(url, requestOptions)
         .then((response) => {
             if (response.status === 200) {
                 this.closeModal('Registration');
-                if(this.state.toEditItem){
-                    toast.success('Usuário atualizado!', {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
-                }else{
-                    toast.success('Usuário criado!', {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
-                }
+                toast.success('Usuário criado!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
                 setTimeout(() => {
                 }, 2000);
                 this.clearState();
@@ -253,6 +237,67 @@ class Users extends Component {
             }
         })
         .catch(e => { console.error(e) });
+    }
+
+    registerFormAtualizar = (event) => {
+
+        event.preventDefault();
+
+        let url = window.server + "/users/" + this.state.toEditItem.id;
+        let token = sessionStorage.getItem('token');
+
+        const data = {
+            "nomeCompleto": this.state.nomeCompleto,
+            // "matricula": this.state.login,
+            "email": this.state.email,
+            // "password": this.state.password,
+            // "mustChangePassword": this.state.checkboxChangePassword || false
+        };
+
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        };
+
+        fetch(url, requestOptions)
+        .then((response) => {
+            if (response.status === 200) {
+                this.closeModal('Registration');
+                toast.success('Usuário Atualizado!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                setTimeout(() => {
+                }, 2000);
+                this.clearState();
+                this.fillList();
+                return;
+            } else {
+            toast.error('Erro ao Atualizar Usuário', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            this.clearState();
+            throw new Error('Falha na requisição: ' + response.status);
+            }
+        })
+        .catch(e => { console.error(e) });
+
+
     }
 
     delete = () => {
@@ -339,7 +384,7 @@ class Users extends Component {
 
     beginEdit = (aluno) => { 
 
-        const url = window.server + "/alunos/" + aluno.id;
+        const url = window.server + "/users/" + aluno.id;
 
         console.log(url)
 
@@ -551,7 +596,7 @@ class Users extends Component {
                     <Modal.Header className='bg-dark text-white' closeButton>
                     <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
-                    <form onSubmit={this.registerForm}>
+                    <form onSubmit={this.registerFormAtualizar}>
                     <Modal.Body>
                         {this.state.toEditItem && <>
                             <div className="modal-body">
