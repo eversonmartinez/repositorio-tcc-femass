@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import com.example.repositorioDeTcc.exception.CategoriaNotFoundException;
+import com.example.repositorioDeTcc.exception.CategoriaComSubcategoriasException;
+
+
 
 import java.util.Date;
 import java.util.HashMap;
@@ -77,5 +81,21 @@ public class CustomExceptionHandler{
         );
 
         return new ResponseEntity<>(exceptionResponseValid, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CategoriaNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleCategoriaNotFoundException(CategoriaNotFoundException ex,
+            WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CategoriaComSubcategoriasException.class)
+    public final ResponseEntity<ExceptionResponse> handleCategoriaComSubcategoriasException(
+            CategoriaComSubcategoriasException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }

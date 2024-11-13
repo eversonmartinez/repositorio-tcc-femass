@@ -3,11 +3,12 @@ package com.example.repositorioDeTcc.mapper;
 import com.example.repositorioDeTcc.dto.TCCDTO;
 import com.example.repositorioDeTcc.model.Categoria;
 import com.example.repositorioDeTcc.model.Orientador;
+import com.example.repositorioDeTcc.model.Subcategoria;
 import com.example.repositorioDeTcc.model.TCC;
 import com.example.repositorioDeTcc.repository.AlunoRepository;
 import com.example.repositorioDeTcc.repository.CategoriaRepository;
 import com.example.repositorioDeTcc.repository.OrientadorRepository;
-import com.example.repositorioDeTcc.service.TCCService;
+import com.example.repositorioDeTcc.repository.SubcategoriaRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,12 @@ public class TCCMapper {
     private OrientadorRepository orientadorRepository;
 
     @Autowired
-    private CategoriaRepository categoriaRepository;
+    private SubcategoriaRepository subcategoriaRepository;
 
     public TCC fromTCCDTOToTCC(TCCDTO tccDTO){
-        Categoria categoria = tccDTO.getIdCategoria() != null ? categoriaRepository.findById(tccDTO.getIdCategoria()).get() : null;
+        Subcategoria subcategoria = tccDTO.getIdSubcategoria() != null ? subcategoriaRepository.findById(tccDTO.getIdSubcategoria()).get() : null;
         return new TCC(tccDTO.getTitulo(), alunoRepository.findById(tccDTO.getIdAluno()).get(), orientadorRepository.findById(tccDTO.getIdOrientador()).get(),
-                tccDTO.getIdCurso(), categoria, tccDTO.getResumo());
+                tccDTO.getIdCurso(),subcategoria, tccDTO.getResumo());
     }
 
     public TCCDTO toTCCDTO(TCC tcc){

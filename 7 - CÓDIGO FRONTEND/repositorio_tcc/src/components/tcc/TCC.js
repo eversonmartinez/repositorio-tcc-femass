@@ -624,7 +624,7 @@ class TCC extends Component {
                                                     {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
                                                 </div>
                                                 <div className="col-12">
-                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Aluno</label>
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Aluno</label>
                                                     <Select
                                                         className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
                                                         classNamePrefix="select"
@@ -641,7 +641,7 @@ class TCC extends Component {
                                                     {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
                                                 </div>
                                                 <div className="col-12">
-                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
+                                                    <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Orientador</label>
                                                     <Select
                                                         className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
                                                         classNamePrefix="select"
@@ -739,7 +739,7 @@ class TCC extends Component {
                                                 <textarea rows="3" className='form-control' style={{resize: "none"}} name="resumo" onChange={this.handleChange} value={this.state.resumo}></textarea>
                                             </div>
                                             <div className="col-12">
-                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Curso</label>
+                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Curso</label>
                                                 <Select
                                                     isDisabled
                                                     className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
@@ -763,7 +763,7 @@ class TCC extends Component {
                                                 />
                                             </div>
                                             <div className="col-12">
-                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Orientador</label>
+                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Orientador</label>
                                                 <Select
                                                     className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
                                                     classNamePrefix="select"
