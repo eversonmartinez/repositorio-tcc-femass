@@ -20,7 +20,7 @@ public class TCCMinDTO {
     private String nomeCompletoAluno;
     private UUID idOrientador;
     private String nomeCompletoOrientador;
-    private Integer idCurso;
+    private UUID idCurso;
     private UUID idSubcategoria;
 
     public TCCMinDTO(TCC entity){
@@ -30,7 +30,7 @@ public class TCCMinDTO {
         this.nomeCompletoAluno = entity.getAluno().getNomeCompleto();
         this.idOrientador = entity.getOrientador().getId();
         this.nomeCompletoOrientador = entity.getOrientador().getNomeCompleto();
-        this.idCurso = entity.getCurso();
+        this.idCurso = entity.getCurso().getId();
         // Verifica se a subcategoria é nula antes de acessar seus atributos
         if(entity.getSubcategoria() != null)
             this.idSubcategoria = entity.getSubcategoria().getId();
