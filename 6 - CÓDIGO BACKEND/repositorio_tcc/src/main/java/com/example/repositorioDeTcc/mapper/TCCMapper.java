@@ -5,10 +5,7 @@ import com.example.repositorioDeTcc.model.Categoria;
 import com.example.repositorioDeTcc.model.Orientador;
 import com.example.repositorioDeTcc.model.Subcategoria;
 import com.example.repositorioDeTcc.model.TCC;
-import com.example.repositorioDeTcc.repository.AlunoRepository;
-import com.example.repositorioDeTcc.repository.CategoriaRepository;
-import com.example.repositorioDeTcc.repository.OrientadorRepository;
-import com.example.repositorioDeTcc.repository.SubcategoriaRepository;
+import com.example.repositorioDeTcc.repository.*;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +27,13 @@ public class TCCMapper {
     @Autowired
     private SubcategoriaRepository subcategoriaRepository;
 
+    @Autowired
+    private CursoRepository cursoRepository;
+
     public TCC fromTCCDTOToTCC(TCCDTO tccDTO){
         Subcategoria subcategoria = tccDTO.getIdSubcategoria() != null ? subcategoriaRepository.findById(tccDTO.getIdSubcategoria()).get() : null;
         return new TCC(tccDTO.getTitulo(), alunoRepository.findById(tccDTO.getIdAluno()).get(), orientadorRepository.findById(tccDTO.getIdOrientador()).get(),
-                tccDTO.getIdCurso(),subcategoria, tccDTO.getResumo());
+                cursoRepository.findById(tccDTO.getIdCurso()).get(),subcategoria, tccDTO.getResumo());
     }
 
     public TCCDTO toTCCDTO(TCC tcc){
