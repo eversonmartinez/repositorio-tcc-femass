@@ -36,8 +36,10 @@ public class SubcategoriaService {
     }
 
     @Transactional (readOnly = true)
-    public List<SubcategoriaDTO> findAll(){
-        List<Subcategoria> list = repository.findAll();
+    public List<SubcategoriaDTO> findAll(UUID idCategoria){
+        //Se o parâmetro de idCategoria foi passado pelo usuário, busque com base nele. Se não, busque todos.
+        List<Subcategoria> list = (idCategoria == null) ? repository.findAll() : repository.findAllByCategoriaId(idCategoria);
+
         List<SubcategoriaDTO> listDTO = list.stream().map(subcategoria-> new SubcategoriaDTO(subcategoria)).toList();
         return listDTO;
     }
@@ -62,11 +64,10 @@ public class SubcategoriaService {
         return subcategoriaMapper.toSubcategoriaDTO(repository.save(entity));
 
     }
-    private void updateData(Subcategoria entity, SubcategoriaDTO obj){
+    private void updateData(Subcategoria entity, SubcategoriaDTO obj) {
         entity.setNomeSubcategoria(obj.getNomeSubcategoria());
         entity.setDescricaoSubcategoria(obj.getDescricaoSubcategoria());
         entity.setCategoria(categoriaRepository.findById(obj.getIdCategoria()).orElseThrow(() -> new ResourceNotFoundException(obj.getIdCategoria())));
     }
-
 }
 
