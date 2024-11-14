@@ -3,20 +3,15 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
+import '../../assets/css/tcc.css';
 
-class Aluno extends Component {
+class Users extends Component {
   
     state = {
         users: [],
         filteredData: [],
         checkboxChangePassword: true,
         checkboxNotifyEmail: true,
-        completeName: '',
-        login: '',
-        email: '',
-        password: '',
-        passwordConfirm: '',
-        filterText: '',
         toDeleteItem: null,
         toViewItem: null,
         toEditItem: null,
@@ -24,10 +19,12 @@ class Aluno extends Component {
         showModalEdit: false,
         showModalRegistration: false,
         showModalView: false,
-        nomeCompleto: null,
-        email: null,
-        telefone: null,
-        matricula: null,
+        nomeCompleto: '',
+        login: '',
+        email: '',
+        password: '',
+        passwordConfirm: '',
+        filterText: '',
     }
 
     columns = [
@@ -35,26 +32,25 @@ class Aluno extends Component {
           name: 'Nome',
           selector: user => user.nomeCompleto,
           sortable: true,
-          width: '40%'
-        },
-        {
-            name: 'Matricula',
+          width: '35%'
+        },{
+            name: 'Matrícula',
             selector: user => user.matricula,
             sortable: true,
-             width: '40%'
+             width: '15%'
           },
-        //   {
-        //     name: 'Email',
-        //     selector: user => user.email,
-        //     sortable: true,
-        //      width: '25%'
-        //   },
-        //   {
-        //     name: 'Telefone',
-        //     selector: user => user.telefone,
-        //     sortable: true,
-        //      width: '25%'
-        //   },
+        {
+          name: 'Email',
+          selector: user => user.email,
+          sortable: true,
+           width: '25%'
+        },
+        {
+            name: 'Role',
+            selector: user => user.role,
+            sortable: true,
+             width: '15%'
+          },
         {
             name: 'Ações',
             cell: user => <>
@@ -62,7 +58,7 @@ class Aluno extends Component {
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Editar Instituto" onClick={() => this.beginEdit(user)}><i className="bi bi-pencil"></i></button>
                 <button className="btn btn-outline-secondary mx-1 px-1 py-0" data-toggle="tooltip" data-placement="top" title="Excluir selecionado" onClick={() => this.beginDeletion(user)}><i className="bi bi-trash"></i></button>
             </>,
-             width: '20%'
+             width: '10%'
         }
     ];
 
@@ -88,36 +84,31 @@ class Aluno extends Component {
                     prevState.filterText === '' || user.nomeCompleto.toLowerCase().includes(prevState.filterText.toLowerCase()) ||
                     user.matricula.toLowerCase().includes(prevState.filterText.toLowerCase()) ||
                     user.email.toLowerCase().includes(prevState.filterText.toLowerCase()) ||
-                    user.telefone.toLowerCase().includes(prevState.filterText.toLowerCase())
+                    user.role.toLowerCase().includes(prevState.filterText.toLowerCase())
                 );
             })
         }));
     }
 
     handleChange = (event) => {
-        if(event.target.name.startsWith('filter')) this.applyFilters();
-        this.setState({ [event.target.name]: event.target.value });
-    };
-    // handleChange = (event) => {
-    //     //definição de funções callbacks, caso necessárias
-    //     let callback = null;
-    //     //se o evento for de checkbox, as alterações prosseguirão a partir de outra função
-    //     if(event.target.name.startsWith('checkbox')) {
-    //         this.handleCheckboxChange(event);
-    //         return;
-    //     }
-    //     if(event.target.name.startsWith('password')) callback = this.validatePassword;
-    //     if(event.target.name === 'filterText') callback = this.applyFilters;
+        //definição de funções callbacks, caso necessárias
+        let callback = null;
+        //se o evento for de checkbox, as alterações prosseguirão a partir de outra função
+        if(event.target.name.startsWith('checkbox')) {
+            this.handleCheckboxChange(event);
+            return;
+        }
+        if(event.target.name.startsWith('password')) callback = this.validatePassword;
+        if(event.target.name === 'filterText') callback = this.applyFilters;
 
-    //     this.setState({ [event.target.name]: event.target.value }, callback);
-    // };
+        this.setState({ [event.target.name]: event.target.value }, callback);
+    };
 
     fillList = () => {
-        const url = window.server + "/alunos";
+        
+        const url = window.server + "/users";
 
         const token = sessionStorage.getItem('token');
-
-        console.log(token)
 
         const requestOptions = {
             method: 'GET',
@@ -130,54 +121,10 @@ class Aluno extends Component {
         fetch(url,requestOptions)
             .then((response) => response.json())
                 .then((data) => this.setState({users: data, filteredData: data}));
-
-        console.log(this.state.filteredData)
-        console.log(this.state.data)
     }
 
     beginRegistration = () => {
         this.setState({ showModalRegistration: true });
-    }
-
-    beginEdit = (aluno) => { 
-
-        const url = window.server + "/alunos/" + aluno.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
-            .then((response) => {
-                if(response.ok) {
-                    return response.json();
-                } else{
-                    throw new Error('Erro na requisição: ' + response.status);
-                }
-            }).then((data) => { 
-                if (data.resumo === null) data.resumo = '';
-                this.setState({ 
-                    toEditItem: data,
-                    showModalEdit: true,
-                    nomeCompleto: data.nomeCompleto,
-                    email: data.email,
-                    telefone: data.telefone,
-                    // tituloTcc: data.titulo,
-                    // resumo: data.resumo,
-                    // // selectedCurso: { value: data.idCurso, label: data.idCurso },
-                    // // selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
-                    // // selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } 
-                
-                });
-            })
-            .catch((error) => {
-            });
     }
 
     validatePassword = () => {
@@ -195,30 +142,25 @@ class Aluno extends Component {
     }
 
     validateForm = () => {
-        // const { completeName, login, email, password, passwordConfirm } = this.state;
-        // if (!completeName || !login || !email || !password || !passwordConfirm) {
-        //     return false;
-        // }
-        // return this.validatePassword();
-        return true
+        const { nomeCompleto, login, email, password, passwordConfirm } = this.state;
+        if (!nomeCompleto || !login || !email || !password || !passwordConfirm) {
+            return false;
+        }
+        return this.validatePassword();
     }
 
     clearState = () => {
         this.setState({
-            nomeCompleto: "",
-            email: "",
-            telefone: "",
-            matricula: "",
+            nomeCompleto: '',
+            login: '',
+            email: '',
+            password: '',
+            passwordConfirm: '',
+            checkboxChangePassword: true,
+            checkboxNotifyEmail: true,
             toDeleteItem: null,
             toViewItem: null,
             toEditItem: null,
-            // completeName: '',
-            // login: '',
-            // email: '',
-            // password: '',
-            // passwordConfirm: '',
-            // checkboxChangePassword: true,
-            // checkboxNotifyEmail: true
         });
     }
 
@@ -228,7 +170,7 @@ class Aluno extends Component {
     }
 
     registerForm = (event) => {
-
+        
         event.preventDefault();
         
         if(!this.validateForm()) {
@@ -244,53 +186,28 @@ class Aluno extends Component {
             return;
         }
 
-        let url = window.server + "/alunos";
+        let url = window.server + "/auth/register";
 
-        let data = {
+        const data = {
             "nomeCompleto": this.state.nomeCompleto,
-            "matricula": this.state.matricula,
+            "matricula": this.state.login,
             "email": this.state.email,
-            "telefone": this.state.telefone,
+            "password": this.state.password,
+            "mustChangePassword": this.state.checkboxChangePassword || false
         };
-
-        const token = sessionStorage.getItem('token');
 
         const requestOptions = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         };
 
-        if(this.state.toEditItem){
-            requestOptions.method = 'PUT';
-            url+= "/" + this.state.toEditItem.id;
-        }
-
         fetch(url, requestOptions)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Erro na requisição: ' + response.status);
-            }
-        })
-        .then(data => {
-            if(this.state.toEditItem){
-                this.setState({showModalEdit: false})
-                toast.success('Usuário atualizado!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-            } else{
-                this.closeModal('Registration')
+        .then((response) => {
+            if (response.status === 200) {
+                this.closeModal('Registration');
                 toast.success('Usuário criado!', {
                     position: "top-right",
                     autoClose: 2000,
@@ -300,34 +217,99 @@ class Aluno extends Component {
                     draggable: true,
                     progress: undefined,
                 });
-            }
-            this.clearState();
-            this.fillList();
-            // Lógica para lidar com a resposta da API
-        })
-        .catch(error => {
-            console.log(error)
-            toast.error('Ocorreu um erro', {
+                setTimeout(() => {
+                }, 2000);
+                this.clearState();
+                this.fillList();
+                return;
+            } else {
+            toast.error('Erro ao criar', {
                 position: "top-right",
-                autoClose: 3000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-              });
-            // Lógica para lidar com o erro
+            });
             this.clearState();
-        });
+            throw new Error('Falha na requisição: ' + response.status);
+            }
+        })
+        .catch(e => { console.error(e) });
     }
-    
+
+    registerFormAtualizar = (event) => {
+
+        event.preventDefault();
+
+        let url = window.server + "/users/" + this.state.toEditItem.id;
+        let token = sessionStorage.getItem('token');
+
+        const data = {
+            "nomeCompleto": this.state.nomeCompleto,
+            // "matricula": this.state.login,
+            "email": this.state.email,
+            // "password": this.state.password,
+            // "mustChangePassword": this.state.checkboxChangePassword || false
+        };
+
+        const requestOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        };
+
+        fetch(url, requestOptions)
+        .then((response) => {
+            if (response.status === 200) {
+                this.closeModal('Registration');
+                toast.success('Usuário Atualizado!', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                setTimeout(() => {
+                }, 2000);
+                this.clearState();
+                this.fillList();
+                return;
+            } else {
+            toast.error('Erro ao Atualizar Usuário', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            this.clearState();
+            throw new Error('Falha na requisição: ' + response.status);
+            }
+        })
+        .catch(e => { console.error(e) });
+
+
+    }
+
     delete = () => {
 
         console.log(this.state.toDeleteItem)
         
-        const url = window.server + "/alunos/" + this.state.toDeleteItem.id;
+        const url = window.server + "/users/" + this.state.toDeleteItem.id;
 
         const token = sessionStorage.getItem('token');
+
+        console.log(token)
+        console.log(url)
 
         const requestOptions = {
             method: 'DELETE',
@@ -342,7 +324,7 @@ class Aluno extends Component {
                 if(response.ok) {
                     this.fillList();
                     this.setState({ showModalDeletion: false });
-                    toast.success('Aluno excluído!', {
+                    toast.success('Usuário excluído!', {
                         position: "top-right",
                         autoClose: 2000,
                         hideProgressBar: false,
@@ -367,14 +349,14 @@ class Aluno extends Component {
             });
     }
 
-    beginDeletion = (alunos) => {
-        this.setState({ toDeleteItem: alunos, showModalDeletion: true });
-        console.log(this.state.showModalDeletion)
+    beginDeletion = (usuarios) => {
+        this.setState({ toDeleteItem: usuarios, showModalDeletion: true });
+        // console.log(this.state.showModalDeletion)
 	}
 
     beginView = (aluno) => { 
 
-        const url = window.server + "/alunos/" + aluno.id;
+        const url = window.server + "/users/" + aluno.id;
 
         const token = sessionStorage.getItem('token');
 
@@ -400,6 +382,50 @@ class Aluno extends Component {
             });
     }
 
+    beginEdit = (aluno) => { 
+
+        const url = window.server + "/users/" + aluno.id;
+
+        console.log(url)
+
+        const token = sessionStorage.getItem('token');
+
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token, // Adicione o token JWT
+                'Content-Type': 'application/json'
+            }
+        };
+
+        fetch(url,requestOptions)
+            .then((response) => {
+                if(response.ok) {
+                    return response.json();
+                } else{
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+            }).then((data) => { 
+                // if (data.resumo === null) data.resumo = '';
+                this.setState({ 
+                    toEditItem: data,
+                    showModalEdit: true,
+                    nomeCompleto: data.nomeCompleto,
+                    email: data.email,
+                    // telefone: data.telefone,
+                    // tituloTcc: data.titulo,
+                    // resumo: data.resumo,
+                    // // selectedCurso: { value: data.idCurso, label: data.idCurso },
+                    // // selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
+                    // // selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } 
+                
+                });
+            })
+            .catch((error) => {
+            });
+    }
+
+
     componentDidMount() {
         this.fillList();
     }
@@ -410,7 +436,7 @@ class Aluno extends Component {
             <Navbar />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Alunos</h1>
+                <h1 className='tittle tittleAfter'>Usuários</h1>
                 
                 <ToastContainer />
 
@@ -461,20 +487,20 @@ class Aluno extends Component {
             <div className='modals'>
                 <Modal show={this.state.showModalRegistration} onHide={() => this.closeModal('Registration')} centered>
                     <Modal.Header closeButton className='bg-dark text-white'>
-                        <Modal.Title>Novo Aluno</Modal.Title>
+                        <Modal.Title>Novo Usuário</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.registerForm}>
                     <Modal.Body>
                             <div className="mb-3 row justify-content-center">  
                                 <div className='col-12'>
-                                <label htmlFor="nomeCompleto" className='required'>Nome Completo</label>
-                                <input type="text" className="form-control" id="nomeCompleto" name="nomeCompleto" required onChange={this.handleChange}></input>
+                                <label htmlFor="completeName" className='required'>Nome Completo</label>
+                                <input type="text" className="form-control" id="completeName" name="completeName" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
                             <div className="mb-3 row justify-content-center">
                                 <div className='col-12'>
-                                    <label htmlFor="matricula" className='required'>Matrícula</label>
-                                    <input type="text" className="form-control" id="matricula" name="matricula" required maxLength={11} onChange={this.handleChange}></input>
+                                    <label htmlFor="login" className='required'>Matrícula ou CPF</label>
+                                    <input type="text" className="form-control" id="login" name="login" required maxLength={11} onChange={this.handleChange}></input>
                                 </div>
                             </div>
                             <div className="mb-3 row justify-content-center">  
@@ -485,10 +511,28 @@ class Aluno extends Component {
                             </div>
                             <div className="mb-4 row justify-content-center">
                                 <div className='col-12'>
-                                <label htmlFor="password" className="col-form-label required">Telefone</label>
-                                <input type="text" className="form-control" id="telefone" name="telefone" required onChange={this.handleChange}></input>
+                                <label htmlFor="password" className="col-form-label required">Senha</label>
+                                <input type="password" className="form-control" id="password" name="password" required onChange={this.handleChange}></input>
                                 </div>
-                            </div>     
+                            </div>
+                            <div className="mb-4 row justify-content-center">
+                                <div className='col-12'>
+                                <label htmlFor="passwordConfirm" className="col-form-label required">Confirme a senha</label>
+                                <input type="password" className="form-control" id="passwordConfirm" name="passwordConfirm" onChange={this.handleChange} required></input>
+                                <div className="invalid-feedback">As senhas não conferem</div>
+                                </div>
+                            </div>
+                            <div className="px-3"> 
+                                <div className="form-check form-switch mb-3">
+                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
+                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha </label>
+                                </div>
+                                {/* <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" value="" name="checkboxNotifyEmail" checked={this.state.checkboxNotifyEmail} onChange={this.handleChange}/>
+                                    <label class="form-check-label" htmlFor=""> Notificar por e-mail </label>
+                                </div> */}
+                            </div>
+                            
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => this.closeModal('Registration')}>
@@ -518,7 +562,7 @@ class Aluno extends Component {
 
                 <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
                     <Modal.Header className='bg-dark text-white' closeButton>
-                    <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.titulo}</>}</Modal.Title>
+                    <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.nome}</>}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                     {this.state.toViewItem && <>
@@ -528,7 +572,7 @@ class Aluno extends Component {
                             </div>
                             <div>
                                 <h5>Matrícula:</h5>
-                                <p>{this.state.toViewItem.matricula}</p>
+                                <p>{this.state.toViewItem.role}</p>
                             </div>
                             <div>
                                 <h5>Email:</h5>
@@ -536,7 +580,7 @@ class Aluno extends Component {
                             </div>
                             <div>
                                 <h5>Telefone:</h5>
-                                <p>{this.state.toViewItem.telefone}</p>
+                                <p>{this.state.toViewItem.matricula}</p>
                             </div>
                             </>
                     }
@@ -552,7 +596,7 @@ class Aluno extends Component {
                     <Modal.Header className='bg-dark text-white' closeButton>
                     <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
-                    <form onSubmit={this.registerForm}>
+                    <form onSubmit={this.registerFormAtualizar}>
                     <Modal.Body>
                         {this.state.toEditItem && <>
                             <div className="modal-body">
@@ -566,10 +610,10 @@ class Aluno extends Component {
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Email</label>
                                                 <textarea rows="3" className='form-control' style={{resize: "none"}} name="email" onChange={this.handleChange} value={this.state.email}></textarea>
                                             </div>
-                                            <div className="col-12">
-                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Telefone</label>
+                                            {/* <div className="col-12">
+                                                <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Role</label>
                                                 <textarea rows="3" className='form-control' style={{resize: "none"}} name="telefone" onChange={this.handleChange} value={this.state.telefone}></textarea>
-                                            </div>
+                                            </div> */}
                                         </div>
                                 </div>
                             </div>
@@ -591,4 +635,4 @@ class Aluno extends Component {
   }
 }
 
-export default Aluno;
+export default Users;
