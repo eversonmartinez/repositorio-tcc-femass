@@ -6,6 +6,7 @@ import InputMask from 'react-input-mask';
 import { ToastContainer, toast } from 'react-toastify';
 import { Button, Modal } from 'react-bootstrap';
 import Navbar from '../navbar/Navbar';
+import { OrientadorService } from '../../service/OrientadorService';
 
 
 function withNavigate(Component) {
@@ -16,7 +17,19 @@ function withNavigate(Component) {
 }
 
 class cadastroOrientador extends Component {
-    
+
+    state = {
+        listOrientador: [],
+        showModalDeletion: false,
+        nomeCompleto: '',
+        cpf: '',
+        telefone: '',
+        email:'',
+        showModalUpload: false
+    }
+
+    orientadorService = new OrientadorService();
+
     resgister = (event) => {
         event.preventDefault();
 
@@ -70,15 +83,6 @@ class cadastroOrientador extends Component {
                 }
             })
             .catch(e => { console.error(e) })
-    }
-
-    state = {
-        listOrientador: [],
-        showModalDeletion: false,
-        nomeCompleto: '',
-        cpf: '',
-        telefone: '',
-        email:''
     }
 
     // carregar os dados na lista
@@ -219,6 +223,10 @@ class cadastroOrientador extends Component {
             });
     }
 
+    beginUpload = () => {
+        this.setState({ showModalUpload: true });
+    }
+
     submitOrientadorForm = (event) => {
         event.preventDefault();
 
@@ -301,6 +309,42 @@ class cadastroOrientador extends Component {
             });
     }
 
+    uploadFile = (event) => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', this.state.uploadOrientadores);
+
+        this.orientadorService.importFromFile(formData)
+            .then((response) => {
+                if(response.status === 200) {
+                    this.setState({ showModalUpload: false });
+                    toast.success('Arquivo carregado com sucesso!', {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                    this.fillList();
+                } 
+            }).catch((error) => {
+                let errorMessage = 'Servidor indisponível';
+                if(error.response) {errorMessage = error.response.data.message;}
+                toast.error('Erro ao carregar arquivo: ' + errorMessage, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+            });
+    }
+
     closeModal = (operationName) => {
         this.clearState();
         this.setState({ ['showModal' + operationName]: false, ['to' + operationName + 'Item']: null });
@@ -324,51 +368,56 @@ class cadastroOrientador extends Component {
     render() {
         return (
             <div>
-            <Navbar />
-            <div>
-                <ToastContainer />
-                <div className='container-fluid d-flex flex-column justify-content-between' style={{ 'minHeight': '100vh' }}>
-                    <div className='row justify-content-center' style={{ 'marginTop': '10vh' }}>
-                        <div className='col-10 col-md-6 col-lg-4 text-center'>
-                            <img src={logoFemass} className="img-fluid" style={{ 'maxWidth': '300px' }} alt="Logo da faculdade"></img>
-                        </div>
-                    </div>
-                    <div className='row mt-5 justify-content-center'>
-                        <div className='col-10 col-md-6 col-lg-3'>
-                            <div className='bg-white border rounded p-4'>
-                                <form onSubmit={this.resgister}>
-                                    <div><h3 >Cadastro de Orientador</h3></div>
-                                    <div class="mb-3 justify-content-center">
-                                        <label for="exampleInputEmail1" class="form-label">Nome Completo</label>
-                                        <input type="text" class="form-control" name='nomeCompleto' id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required />
-                                    </div>
-                                    <div class="mb-3 justify-content-center">
-                                        <label for="InputCPF" class="form-label">CPF</label>
-                                        <InputMask mask="999.999.999-99"
-                                            type="text" class="form-control" name='cpf' id="cpf" onChange={this.handleChange} value={this.state.cpf} required >
-                                            {(inputProps) => <input {...inputProps} type="text" />}
-                                        </InputMask>
-                                    </div>
-                                    <div class="mb-3 justify-content-center">
-                                        <label for="InputTelefone" class="form-label">telefone</label>
-                                        <InputMask mask="(99)9999-99999"
-                                            type="text" class="form-control" name='telefone' id="telefone" onChange={this.handleChange} value={this.state.telefone} required >
-                                            {(inputProps) => <input {...inputProps} type="text" />}
-                                        </InputMask>
-                                    </div>
-                                    <div class="mb-3 justify-content-center">
-                                        <label for="exampleInputEmail1" class="form-label">Email</label>
-                                        <input type="email" class="form-control" name='email' id="email" required placeholder="email@email.com" onChange={this.handleChange} value={this.state.email} />
-                                    </div>
-                                    <div class="mb-3 justify-content-center">
-                                        <button class="btn btn-dark" type='submit'>Criar</button>
-                                    </div>
-                                </form>
+                <Navbar />
+                <div>
+                    <ToastContainer />
+                    <div className='mt-5 container-fluid d-flex flex-column justify-content-between'>
+                        <div className='row mt-5 justify-content-center'>
+                            <div className='col-10 col-md-6 col-lg-3'>
+                                <div className='bg-white border rounded p-4'>
+                                    <form onSubmit={this.resgister}>
+                                        <div><h3 >Cadastro de Orientador</h3></div>
+                                        <div class="mb-3 justify-content-center">
+                                            <label for="exampleInputEmail1" class="form-label">Nome Completo</label>
+                                            <input type="text" class="form-control" name='nomeCompleto' id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required />
+                                        </div>
+                                        <div class="mb-3 justify-content-center">
+                                            <label for="InputCPF" class="form-label">CPF</label>
+                                            <InputMask mask="999.999.999-99"
+                                                type="text" class="form-control" name='cpf' id="cpf" onChange={this.handleChange} value={this.state.cpf} required >
+                                                {(inputProps) => <input {...inputProps} type="text" />}
+                                            </InputMask>
+                                        </div>
+                                        <div class="mb-3 justify-content-center">
+                                            <label for="InputTelefone" class="form-label">telefone</label>
+                                            <InputMask mask="(99)9999-99999"
+                                                type="text" class="form-control" name='telefone' id="telefone" onChange={this.handleChange} value={this.state.telefone} required >
+                                                {(inputProps) => <input {...inputProps} type="text" />}
+                                            </InputMask>
+                                        </div>
+                                        <div class="mb-3 justify-content-center">
+                                            <label for="exampleInputEmail1" class="form-label">Email</label>
+                                            <input type="email" class="form-control" name='email' id="email" required placeholder="email@email.com" onChange={this.handleChange} value={this.state.email} />
+                                        </div>
+                                        <div class="mb-3 justify-content-center">
+                                            <button class="btn btn-dark" type='submit'>Criar</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div className="my-3 d-flex justify-content-center m-auto w-50">
+                        <button 
+                            type="button" 
+                            className="btn btn-primary fw-bold"
+                            style={{ width: '45%' }} 
+                            onClick={this.beginUpload}
+                        >
+                            <i className="bi bi-cloud-upload"></i> Importar arquivo
+                        </button>
+                    </div>
                     {/* Tabela de orientadores cadastrado */}
-                    <p></p>
                     <h4 className="text-center">Lista de Orientadores</h4>
                     <div class="container">
                         <table class="table table-striped table-hover">
@@ -387,11 +436,6 @@ class cadastroOrientador extends Component {
                                 )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum orientador encontrado</td></tr>}
                             </tbody>
                         </table>
-                    </div>
-                    <div className='row justify-content-end mt-auto'>
-                    <div className='col-6 col-md-4 text-end'>
-                        <img src={logo} className="img-fluid mb-3 me-2" style={{ 'maxWidth': '180px' }} alt="Logo da faculdade"></img>
-                    </div>
                     </div>
 
                     {/* Modal de exclusão */}
@@ -455,7 +499,32 @@ class cadastroOrientador extends Component {
                             </Modal.Footer>
                         </form>
                     </Modal>
-                </div>
+
+                    {/* Modal de Upload */}
+                    <Modal show={this.state.showModalUpload} onHide={() => this.closeModal('Upload')} centered size='md'> 
+                    <Modal.Header closeButton className='bg-dark text-white' closeVariant='white'>
+                        <Modal.Title>Importação de Orientadores</Modal.Title>
+                    </Modal.Header>
+                    <form onSubmit={this.uploadFile}>
+                    <Modal.Body>
+                            <div className="mb-3 row justify-content-center">  
+                                <div className='col-12'>
+                                    <label htmlFor="upload-orientadores" className='form-label'>Carregue o arquivo</label>
+                                    <input type="file" id="upload-orientadores" className='form-control' name="uploadOrientadores" accept=".csv,.xls,.xlsx" required onChange={this.handleChange}></input>
+                                    <small className="form-text text-muted">Formatos aceitos: CSV, XLS, XLSX</small>
+                                </div>
+                            </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeModal('Upload')}>
+                            Cancelar
+                        </Button>
+                        <Button variant="success" type='submit' disabled={!this.state.uploadOrientadores}>
+                            Carregar
+                        </Button>
+                    </Modal.Footer>
+                    </form>
+                </Modal>
                 </div>
             </div>
         )
