@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TCCService } from '../../service/TCCService';
 import { AlunoService } from '../../service/AlunoService';
 import { OrientadorService } from '../../service/OrientadorService';
+import { CursoService } from '../../service/CursoService';
 
 function withNavigate(Component) {
     return (props) => {
@@ -27,12 +28,7 @@ class TCC extends Component {
         filteredItems: [],
         optionsAlunos: [],
         optionsOrientadores: [],
-        optionsCursos: [
-            {value: 1, label: 'Sistemas de Informação'},
-            {value: 2, label: 'Administração'},
-            {value: 3, label: 'Engenharia de Produção'},
-            {value: 4, label : 'Matemática'},
-        ],
+        optionsCursos: [],
         isCursoInvalid: false,
         selectedCurso: null,
         isAlunoInvalid: false,
@@ -55,6 +51,7 @@ class TCC extends Component {
     tccService = new TCCService();
     alunoService = new AlunoService();
     orientadorService = new OrientadorService();
+    cursoService = new CursoService();
 
     columns = [
         {
@@ -182,9 +179,21 @@ class TCC extends Component {
             })
     }
 
+    fillOptionsCursos = () => {
+        this.cursoService.listAll()
+            .then((response) => {
+                    const optionsCursos = response.data.map(curso => ({
+                        value: curso.id,
+                        label: curso.nome
+                    }));
+                    this.setState({ optionsCursos });
+            })
+    }
+
     beginInsertion = () => {
         this.fillOptionsAlunos();
         this.fillOptionsOrientadores();
+        this.fillOptionsCursos();
     }
 
     validateForm = () => {
@@ -376,7 +385,7 @@ class TCC extends Component {
                     showModalEdit: true,
                     tituloTcc: data.titulo,
                     resumo: data.resumo,
-                    selectedCurso: { value: data.idCurso, label: data.idCurso },
+                    selectedCurso: { value: data.idCurso, label: data.nomeCurso },
                     selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
                     selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } });
             })
@@ -668,15 +677,15 @@ class TCC extends Component {
                                     </div>
                                     <div>
                                         <h5>Autor:</h5>
-                                        <p>{this.state.toViewItem.idAluno}</p>
+                                        <p>{this.state.toViewItem.nomeCompletoAluno}</p>
                                     </div>
                                     <div>
                                         <h5>Autor:</h5>
-                                        <p>{this.state.toViewItem.idOrientador}</p>
+                                        <p>{this.state.toViewItem.nomeCompletoOrientador}</p>
                                     </div>
                                     <div>
                                         <h5>Curso:</h5>
-                                        <p>{this.state.toViewItem.idCurso}</p>
+                                        <p>{this.state.toViewItem.nomeCurso}</p>
                                     </div>
                                     </>
                                 }
