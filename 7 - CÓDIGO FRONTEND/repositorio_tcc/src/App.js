@@ -10,7 +10,7 @@ import TCC from './components/tcc/TCC.js';
 import { PasswordModalProvider } from './components/passwordChange/PasswordModalContext'; // O provedor do contexto
 import PasswordChangeModal from './components/passwordChange/PasswordChangeModal'; // O modal global
 import ChangePassword from './HOC/ChangePassword.js';
-import CadastroOrientador from './components/orientador/CadastroOrientador.js';
+import Orientador from './components/orientador/Orientador.js';
 import Users from './components/users/Users.js';
 import ResetPassword from './components/resetPassword/ResetPassword.js';
 import { useLocation } from 'react-router-dom';
@@ -27,7 +27,7 @@ class App extends React.Component{
       <ProtectedRoute component={() => <ChangePassword component={Aluno} {...props} />} />
     );
     const ProtectedOrientador = (props) => (
-      <ProtectedRoute component={() => <ChangePassword component={CadastroOrientador} {...props} />} />
+      <ProtectedRoute component={() => <ChangePassword component={Orientador} {...props} />} />
     );
     const ProtectedTCC = (props) => (
       <ProtectedRoute component={() => <ChangePassword component={TCC} {...props} />} />
