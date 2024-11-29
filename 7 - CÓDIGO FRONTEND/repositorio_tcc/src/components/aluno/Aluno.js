@@ -4,6 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
 import { AlunoService } from '../../service/AlunoService';
+import { TranslationService } from '../../service/TranslationService';
 
 class Aluno extends Component {
   
@@ -27,7 +28,6 @@ class Aluno extends Component {
         showModalView: false,
         showModalUpload: false,
         nomeCompleto: null,
-        email: null,
         telefone: null,
         matricula: null,
         uploadAlunos: null
@@ -298,7 +298,6 @@ class Aluno extends Component {
             // Lógica para lidar com a resposta da API
         })
         .catch(error => {
-            console.log(error)
             toast.error('Ocorreu um erro', {
                 position: "top-right",
                 autoClose: 3000,
@@ -315,8 +314,6 @@ class Aluno extends Component {
     
     delete = () => {
 
-        console.log(this.state.toDeleteItem)
-        
         const url = window.server + "/alunos/" + this.state.toDeleteItem.id;
 
         const token = sessionStorage.getItem('token');
@@ -361,7 +358,6 @@ class Aluno extends Component {
 
     beginDeletion = (alunos) => {
         this.setState({ toDeleteItem: alunos, showModalDeletion: true });
-        console.log(this.state.showModalDeletion)
 	}
 
     beginView = (aluno) => { 
@@ -402,7 +398,7 @@ class Aluno extends Component {
             .then((response) => {
                 if(response.status === 200) {
                     this.setState({ showModalUpload: false });
-                    toast.success('Arquivo carregado com sucesso!', {
+                    toast.success('Arquivo carregado com sucesso! ' + response.data + " novo(s) registro(s) inserido(s).", {
                         position: "top-right",
                         autoClose: 2000,
                         hideProgressBar: false,
@@ -415,7 +411,7 @@ class Aluno extends Component {
                 } 
             }).catch((error) => {
                 let errorMessage = 'Servidor indisponível';
-                if(error.response) {errorMessage = error.response.data.message;}
+                if(error.response) {errorMessage = TranslationService.translate(error.response.data.message);}
                 toast.error('Erro ao carregar arquivo: ' + errorMessage, {
                     position: "top-right",
                     autoClose: 2000,
@@ -442,7 +438,7 @@ class Aluno extends Component {
                 
                 <ToastContainer />
 
-                <div className='col-12 col-md-3 ms-5'>
+                <div className='col-sm-10 col-md-6 col-lg-5 col-xl-4 ms-5'>
                     <div className="card mx-3" style={{ maxWidth: '500px' }}>
                         <div className="card-body">
                             <button 
