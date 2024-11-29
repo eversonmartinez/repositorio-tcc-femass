@@ -98,4 +98,10 @@ public class CustomExceptionHandler{
                 request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NoDataInFileException.class)
+    public final ResponseEntity<ExceptionResponse> handleNoDataInFileException(NoDataInFileException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
 }
