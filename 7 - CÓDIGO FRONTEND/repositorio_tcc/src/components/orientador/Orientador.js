@@ -323,10 +323,13 @@ class Orientador extends Component {
         return (
             <div>
                 <Navbar />
-                <div>
                     <ToastContainer />
+                <div className='page-content'>
+                    <div className="col-12 mb-4 mt-4">
+                        <h1 className='display-5 fw-bold mb-4 tittle tittleAfter'>Orientadores</h1>
+                    </div>
                     <div className='mt-5 mb-3 container-fluid d-flex flex-column justify-content-between'>
-                        <div className='row mt-5 justify-content-center'>
+                        <div className='row justify-content-center'>
                             <div className='col-10 col-md-6 col-lg-3'>
                                 <div className='bg-white border rounded p-4'>
                                     <form onSubmit={this.resgister}>

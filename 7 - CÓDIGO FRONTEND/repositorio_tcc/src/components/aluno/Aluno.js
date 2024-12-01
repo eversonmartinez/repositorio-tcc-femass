@@ -432,11 +432,13 @@ class Aluno extends Component {
         return (
         <div>
             <Navbar />
+            <ToastContainer />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Alunos</h1>
+                <div className="col-12 mb-4 mt-4">
+                    <h1 className='display-5 fw-bold mb-4 tittle tittleAfter'>Alunos</h1>
+                </div>
                 
-                <ToastContainer />
 
                 <div className='col-sm-10 col-md-6 col-lg-5 col-xl-4 ms-5'>
                     <div className="card mx-3" style={{ maxWidth: '500px' }}>

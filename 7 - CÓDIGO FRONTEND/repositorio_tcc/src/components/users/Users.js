@@ -3,7 +3,6 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
-import '../../assets/css/tcc.css';
 
 class Users extends Component {
   

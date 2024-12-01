@@ -3,32 +3,6 @@
     overflow: hidden;
 }
 
-.tittle {
-	margin-top: 40px;
-	font-size: 50px;
-	position: relative;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.tittleAfter::after {
-	content: '';
-	position: absolute;
-	left: 25%;
-	bottom: -4px;
-	width: 50%;
-	height: 4px;
-	background-color: black;
-	transform: scaleX(0);
-	transform-origin: bottom right;
-	transition: transform 0.3s ease-out;
-}
-
-.tittleAfter:hover::after {
-	transform: scaleX(1);
-	transform-origin: bottom left;
-}
-
 .card {
     transition: all 0.3s ease;
 }
