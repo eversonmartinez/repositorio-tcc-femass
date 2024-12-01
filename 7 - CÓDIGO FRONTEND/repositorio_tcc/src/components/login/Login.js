@@ -144,7 +144,17 @@ class Login extends Component {
           });
         }
       })
-      .catch(e => { console.log(e) })
+      .catch(e => { 
+        toast.error('Erro de servidor', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }); 
+      });
 
     setTimeout(() => {
       loginButton.disabled = false;
@@ -379,7 +389,7 @@ class Login extends Component {
           </div>
         </div>
         <div className='row mt-5 justify-content-center'>
-          <div className='col-10 col-md-6 col-lg-3'>
+          <div className='col-10 col-md-6 col-lg-5 col-xl-3'>
             <div className='bg-white border rounded p-4'>
               {box}
             </div>

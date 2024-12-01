@@ -9,7 +9,6 @@ class Users extends Component {
     state = {
         users: [],
         filteredData: [],
-        checkboxChangePassword: true,
         checkboxNotifyEmail: true,
         toDeleteItem: null,
         toViewItem: null,
@@ -21,8 +20,6 @@ class Users extends Component {
         nomeCompleto: '',
         login: '',
         email: '',
-        password: '',
-        passwordConfirm: '',
         filterText: '',
     }
 
@@ -97,9 +94,7 @@ class Users extends Component {
             this.handleCheckboxChange(event);
             return;
         }
-        if(event.target.name.startsWith('password')) callback = this.validatePassword;
         if(event.target.name === 'filterText') callback = this.applyFilters;
-
         this.setState({ [event.target.name]: event.target.value }, callback);
     };
 
@@ -126,26 +121,12 @@ class Users extends Component {
         this.setState({ showModalRegistration: true });
     }
 
-    validatePassword = () => {
-        if(!this.state.password || !this.state.passwordConfirm) return false;
-        const passwordConfirmElement = document.getElementById('passwordConfirm');
-        if(this.state.password !== this.state.passwordConfirm) {
-          passwordConfirmElement.setCustomValidity('As senhas não conferem');
-          passwordConfirmElement.classList.add('is-invalid');
-        } else {
-            passwordConfirmElement.setCustomValidity('');
-            passwordConfirmElement.classList.remove('is-invalid');
-        }
-
-        return passwordConfirmElement.checkValidity();
-    }
-
     validateForm = () => {
-        const { nomeCompleto, login, email, password, passwordConfirm } = this.state;
-        if (!nomeCompleto || !login || !email || !password || !passwordConfirm) {
+        const { nomeCompleto, login, email } = this.state;
+        if (!nomeCompleto || !login || !email) {
             return false;
         }
-        return this.validatePassword();
+        return true;
     }
 
     clearState = () => {
@@ -153,9 +134,6 @@ class Users extends Component {
             nomeCompleto: '',
             login: '',
             email: '',
-            password: '',
-            passwordConfirm: '',
-            checkboxChangePassword: true,
             checkboxNotifyEmail: true,
             toDeleteItem: null,
             toViewItem: null,
@@ -191,8 +169,7 @@ class Users extends Component {
             "nomeCompleto": this.state.nomeCompleto,
             "matricula": this.state.login,
             "email": this.state.email,
-            "password": this.state.password,
-            "mustChangePassword": this.state.checkboxChangePassword || false
+            "mustChangePassword": true
         };
 
         const requestOptions = {
@@ -247,10 +224,7 @@ class Users extends Component {
 
         const data = {
             "nomeCompleto": this.state.nomeCompleto,
-            // "matricula": this.state.login,
             "email": this.state.email,
-            // "password": this.state.password,
-            // "mustChangePassword": this.state.checkboxChangePassword || false
         };
 
         const requestOptions = {
@@ -301,14 +275,9 @@ class Users extends Component {
 
     delete = () => {
 
-        console.log(this.state.toDeleteItem)
-        
         const url = window.server + "/users/" + this.state.toDeleteItem.id;
 
         const token = sessionStorage.getItem('token');
-
-        console.log(token)
-        console.log(url)
 
         const requestOptions = {
             method: 'DELETE',
@@ -350,7 +319,6 @@ class Users extends Component {
 
     beginDeletion = (usuarios) => {
         this.setState({ toDeleteItem: usuarios, showModalDeletion: true });
-        // console.log(this.state.showModalDeletion)
 	}
 
     beginView = (aluno) => { 
@@ -384,8 +352,6 @@ class Users extends Component {
     beginEdit = (aluno) => { 
 
         const url = window.server + "/users/" + aluno.id;
-
-        console.log(url)
 
         const token = sessionStorage.getItem('token');
 
@@ -492,8 +458,8 @@ class Users extends Component {
                     <Modal.Body>
                             <div className="mb-3 row justify-content-center">  
                                 <div className='col-12'>
-                                <label htmlFor="completeName" className='required'>Nome Completo</label>
-                                <input type="text" className="form-control" id="completeName" name="completeName" required onChange={this.handleChange}></input>
+                                <label htmlFor="nomeCompleto" className='required'>Nome Completo</label>
+                                <input type="text" className="form-control" id="nomeCompleto" name="nomeCompleto" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
                             <div className="mb-3 row justify-content-center">
@@ -507,29 +473,6 @@ class Users extends Component {
                                 <label htmlFor="email" className='required'>E-mail</label>
                                 <input type="email" className="form-control" id="email" name="email" required placeholder="email@email.com" onChange={this.handleChange}></input>
                                 </div>
-                            </div>
-                            <div className="mb-4 row justify-content-center">
-                                <div className='col-12'>
-                                <label htmlFor="password" className="col-form-label required">Senha</label>
-                                <input type="password" className="form-control" id="password" name="password" required onChange={this.handleChange}></input>
-                                </div>
-                            </div>
-                            <div className="mb-4 row justify-content-center">
-                                <div className='col-12'>
-                                <label htmlFor="passwordConfirm" className="col-form-label required">Confirme a senha</label>
-                                <input type="password" className="form-control" id="passwordConfirm" name="passwordConfirm" onChange={this.handleChange} required></input>
-                                <div className="invalid-feedback">As senhas não conferem</div>
-                                </div>
-                            </div>
-                            <div className="px-3"> 
-                                <div className="form-check form-switch mb-3">
-                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
-                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha </label>
-                                </div>
-                                {/* <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" value="" name="checkboxNotifyEmail" checked={this.state.checkboxNotifyEmail} onChange={this.handleChange}/>
-                                    <label class="form-check-label" htmlFor=""> Notificar por e-mail </label>
-                                </div> */}
                             </div>
                             
                     </Modal.Body>
