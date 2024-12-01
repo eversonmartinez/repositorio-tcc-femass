@@ -435,13 +435,24 @@ class TCC extends Component {
                         <motion.button 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="btn btn-primary btn-lg d-flex align-items-center new-tcc-button"
+                            className="btn btn-primary btn-lg d-flex align-items-center new-tcc-button styled-button"
                             data-bs-toggle="modal" 
                             data-bs-target="#insertionModal" 
                             onClick={this.beginInsertion}
                         >
                             <i className="bi bi-file-earmark-plus fs-4 me-2"></i>
                             <span>Novo TCC</span>
+                        </motion.button>
+                    </div>
+                    <div className="col-auto">
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="btn btn-secondary btn-lg d-flex align-items-center categories-button styled-button"
+                            onClick={() => this.props.navigate('/categorias')}
+                        >
+                            <i className="bi bi-filter-square fs-4 me-2"></i>
+                            <span>Categorias</span>
                         </motion.button>
                     </div>
                 </div>

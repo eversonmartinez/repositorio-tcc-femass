@@ -14,6 +14,7 @@ import Orientador from './components/orientador/Orientador.js';
 import Users from './components/users/Users.js';
 import ResetPassword from './components/resetPassword/ResetPassword.js';
 import { useLocation } from 'react-router-dom';
+import Categoria from './components/categoria/Categoria.js';
 
 class App extends React.Component{
   
@@ -35,6 +36,9 @@ class App extends React.Component{
     const ProtectedUsers = (props) => (
       <ProtectedRoute component={() => <ChangePassword component={Users} {...props} />} />
     );
+    const ProtectedCategoria = (props) => (
+      <ProtectedRoute component={() => <ChangePassword component={Categoria} {...props} />} />
+    );
     const ParametrizedResetPasword = (props) => (
       <ResetPassword location={useLocation()} />
     );
@@ -50,6 +54,7 @@ class App extends React.Component{
             <Route exact path="/alunos" element={<ProtectedAluno />}></Route>
             <Route exact path="/orientadores" element={<ProtectedOrientador />}></Route>
             <Route exact path="/tcc" element={<ProtectedTCC />}></Route>
+            <Route exact path="/categorias" element={<ProtectedCategoria />}></Route>
             <Route exact path="/users" element={<ProtectedUsers />}></Route>
             <Route exact path="/reset-password" element={<ParametrizedResetPasword />}></Route>
           </Routes>
