@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../navbar/Navbar';
-import '../../assets/css/tcc.css';
+import '../../assets/css/meutcc.css';
 import Select from 'react-select'
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
