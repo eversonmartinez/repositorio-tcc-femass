@@ -77,7 +77,8 @@ public class AuthService {
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
         String role = "USER";
-        User newUser = new User(registerUserDTO.nomeCompleto(), registerUserDTO.matricula(), registerUserDTO.email(), encryptedPassword, Role.valueOf(role));
+        User newUser = new User(registerUserDTO);
+        newUser.setPassword(encryptedPassword);
 
         User persistedUser = userRepository.save(newUser);
 
