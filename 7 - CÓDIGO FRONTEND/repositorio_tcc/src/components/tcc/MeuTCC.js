@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Navbar from '../navbar/Navbar';
 import '../../assets/css/tcc.css';
 import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable';
 import { Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion } from 'framer-motion';
@@ -28,10 +29,11 @@ class MeuTCC extends Component {
         originalsubcategoria: '',
         selectedSubcategoria: '',
         originalkeywords: '',
-        keywords: '',
+        selectedKeywords: '',
         changesMade: false,
         optionsCategorias: [],
-        optionsSubcategorias: []
+        optionsSubcategorias: [],
+        optionsKeywords: []
     }
 
     tccService = new TCCService();
@@ -72,7 +74,7 @@ class MeuTCC extends Component {
                     value: categoria.id,
                     label: categoria.nomeCategoria
                 }));
-                this.setState({ optionsCategorias });
+                this.setState({ optionsCategorias }, console.log(this.state.optionsCategorias));
             });
     }
 
@@ -326,13 +328,15 @@ class MeuTCC extends Component {
                             <div className='row'>
                                 <div className="col-12">
                                     <label htmlFor="selectKeywords" className="form-label fw-bold">Palavras-Chave</label>
-                                    <Select
+                                    <CreatableSelect
+                                        isMulti
                                         className={`basic-single`}
                                         classNamePrefix="select"
-                                        name="selectKeywords"
+                                        name="selectedKeywords"
                                         id="selectKeywords"
-                                        options={this.state.optionsCursos}
-                                        value={this.state.selectedCurso}
+                                        options={this.state.optionsKeywords}
+                                        value={this.state.selectedKeywords}
+                                        onChange={(selectedOption, actionMeta) => this.handleChangeSelect(selectedOption, actionMeta.name)}
                                         noOptionsMessage={() => 'Nenhuma opção encontrada'}
                                         placeholder="Selecione..."
                                     />
