@@ -1,41 +1,53 @@
 import React, { Component } from 'react'
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../navbar/Navbar';
 import '../../assets/css/tcc.css';
 import Select from 'react-select'
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
-import DataTable from 'react-data-table-component';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TCCService } from '../../service/TCCService';
-import { AlunoService } from '../../service/AlunoService';
-import { OrientadorService } from '../../service/OrientadorService';
-import { CursoService } from '../../service/CursoService';
+import { CategoriaService } from '../../service/CategoriaService';
+import { SubcategoriaService } from '../../service/SubcategoriaService';
 
 
-const defaultSelectOption = { value: '', label: 'Selecione...', isDisabled: true };
+//const defaultSelectOption = { value: '', label: 'Selecione...', isDisabled: true };
 
 class MeuTCC extends Component {
   
     state = {
         tccExistente: false,
+        originalresumo: '',
         resumo: '',
-        tituloTcc: '',
+        originaltituloTcc: 'macaco',
+        tituloTcc: 'macaco',
         curso: '',
         aluno: '',
         orientador: '',
-        categoria: '',
-        subcategoria: '',
+        originalcategoria: '',
+        selectedCategoria: '',
+        originalsubcategoria: '',
+        selectedSubcategoria: '',
+        originalkeywords: '',
         keywords: '',
-        changesMade: true,
+        changesMade: false,
+        optionsCategorias: [],
+        optionsSubcategorias: []
     }
 
     tccService = new TCCService();
+    categoriaService = new CategoriaService();
+    subcategoriaService = new SubcategoriaService();
 
     handleChange = (event) => {
-        if(event.target.name.startsWith('filter')) this.applyFilters();
+        this.setState({ changesMade: true });
         this.setState({ [event.target.name]: event.target.value });
     };
+
+    handleChangeSelect = (option, elementName) => {
+        this.setState({ changesMade: true });
+        if(elementName.startsWith('selectedCategoria')) this.fillOptionsSubcategorias(option.value);
+        this.setState({ [elementName]: option });
+    }
 
     fillList = () => {
         this.tccService.listAll()
@@ -54,14 +66,29 @@ class MeuTCC extends Component {
     }
 
     fillOptionsCategorias = () => {
-        this.cursoService.listAll()
+        this.categoriaService.listAll()
             .then((response) => {
-                    const optionsCursos = response.data.map(curso => ({
-                        value: curso.id,
-                        label: curso.nome
-                    }));
-                    this.setState({ optionsCursos });
+                const optionsCategorias = response.data.map(categoria => ({
+                    value: categoria.id,
+                    label: categoria.nomeCategoria
+                }));
+                this.setState({ optionsCategorias });
+            });
+    }
+
+    fillOptionsSubcategorias = (categoria) => {
+        this.subcategoriaService.findAllByCategoria(categoria)
+            .then((response) => {
+                if(response.status !== 200){ throw new Error('Erro na requisição: ' + response.status); }
+                
+                const optionsSubcategorias = response.data.map(subcategoria => ({
+                    value: subcategoria.id,
+                    label: subcategoria.nomeSubcategoria
+                }));
+                this.setState({ optionsSubcategorias });
+                return;
             })
+            .catch((error) => { });
     }
 
     validateForm = () => {
@@ -83,6 +110,17 @@ class MeuTCC extends Component {
             selectedCurso: null,
             selectedOrientador: null,
             resumo: '',
+        });
+    }
+
+    revertFields = () => {
+        this.setState({
+            tituloTcc: this.state.originaltituloTcc,
+            resumo: this.state.originalresumo,
+            selectedCategoria: this.state.originalcategoria,
+            selectedSubcategoria: this.state.originalsubcategoria,
+            selectedKeywords: this.state.originalkeywords,
+            changesMade: false
         });
     }
 
@@ -165,14 +203,19 @@ class MeuTCC extends Component {
         //     .then((response) => {
         //         this.setState({
         //             tccExistente: true,
+        //             originaltituloTcc: response.data.titulo,
         //             tituloTcc: response.data.titulo,
+        //             originalresumo: response.data.resumo,
         //             resumo: response.data.resumo,
         //             curso: response.data.curso,
         //             aluno: response.data.aluno,
         //             orientador: response.data.orientador,
-        //             categoria: response.data.categoria,
-        //             subcategoria: response.data.subcategoria,
-        //             keywords: response.data.keywords,
+        //             originalcategoria: response.data.categoria,
+        //             selectedCategoria: response.data.categoria,
+        //             originalsubcategoria: response.data.subcategoria,
+        //             selectedSubcategoria: response.data.subcategoria,
+        //             originalkeywords: response.data.keywords,
+        //             keywords: response.data.keywords
         //         });
         //     })
         //     .catch((error) => {
@@ -190,6 +233,7 @@ class MeuTCC extends Component {
 
     componentDidMount() {
         this.getMyTcc();
+        this.fillOptionsCategorias();
     }
 
     render() {
@@ -209,11 +253,11 @@ class MeuTCC extends Component {
                     </div>
                 </div>
 
-                        {/* <motion.div 
-                            whileHover={{ scale: 1.01 }}
-                            className="card border-0 shadow-sm"
-                        > */}
-                        {/* </motion.div> */}
+                {/* <motion.div 
+                    whileHover={{ scale: 1.01 }}
+                    className="card border-0 shadow-sm"
+                > */}
+                {/* </motion.div> */}
 
                 <div className='px-4'>
                     <div className="document-container">
@@ -238,7 +282,7 @@ class MeuTCC extends Component {
                             </div>
                             <div className='row mb-3'>
                                 <div className="col-sm-12 col-md-6 mb-sm-3 mb-md-0">
-                                    <label htmlFor="inputStudent" className="form-label fw-bold">Aluno</label>
+                                    <label htmlFor="inputStudent" className="form-label fw-bold">Autor</label>
                                     <input type="text" id="inputStudent" className="form-control" disabled />
                                 </div>
                                 <div className="col-sm-12 col-md-6">
@@ -250,27 +294,30 @@ class MeuTCC extends Component {
                                 <div className="col-sm-12 col-md-6 mb-sm-3 mb-md-0">
                                     <label htmlFor="selectCategoria" className="form-label fw-bold">Categoria</label>
                                     <Select
-                                        className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
+                                        className={`basic-single`}
                                         classNamePrefix="select"
-                                        name="selectCategoria"
+                                        name="selectedCategoria"
                                         id="selectCategoria"
-                                        defaultValue={defaultSelectOption}
-                                        options={this.state.optionsCursos}
-                                        value={this.state.selectedCurso}
+                                        options={this.state.optionsCategorias}
+                                        value={this.state.selectedCategoria}
+                                        onChange={(selectedOption, actionMeta) => this.handleChangeSelect(selectedOption, actionMeta.name)}
+                                        noOptionsMessage={() => 'Nenhuma opção encontrada'}
                                         placeholder="Selecione..."
                                     />
                                 </div>
                                 <div className="col-sm-12 col-md-6">
                                     <label htmlFor="selectSubcategoria" className="form-label fw-bold">Subcategoria</label>
                                     <Select
-                                        className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
+                                        className={`basic-single`}
                                         classNamePrefix="select"
-                                        name="selectSubcategoria"
+                                        name="selectedSubcategoria"
                                         id="selectSubcategoria"
-                                        defaultValue={defaultSelectOption}
-                                        options={this.state.optionsCursos}
-                                        value={this.state.selectedCurso}
-                                        placeholder="Selecione..."
+                                        options={this.state.optionsSubcategorias}
+                                        value={this.state.selectedSubcategoria}
+                                        onChange={(selectedOption, actionMeta) => this.handleChangeSelect(selectedOption, actionMeta.name)}
+                                        isDisabled={!this.state.selectedCategoria}
+                                        noOptionsMessage={() => 'Nenhuma opção encontrada'}
+                                        placeholder={`${!this.state.selectedCategoria ? 'Selecione uma categoria...' : 'Selecione...'}`}
                                     />
                                 </div>
                             </div>
@@ -278,13 +325,13 @@ class MeuTCC extends Component {
                                 <div className="col-12">
                                     <label htmlFor="selectKeywords" className="form-label fw-bold">Palavras-Chave</label>
                                     <Select
-                                        className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
+                                        className={`basic-single`}
                                         classNamePrefix="select"
                                         name="selectKeywords"
                                         id="selectKeywords"
-                                        defaultValue={defaultSelectOption}
                                         options={this.state.optionsCursos}
                                         value={this.state.selectedCurso}
+                                        noOptionsMessage={() => 'Nenhuma opção encontrada'}
                                         placeholder="Selecione..."
                                     />
                                 </div>
@@ -295,7 +342,7 @@ class MeuTCC extends Component {
                                 <div className="col-12 d-flex justify-content-end gap-3">
                                     <Button 
                                         variant="outline-secondary" 
-                                        onClick={() => this.closeModal('Deletion')} 
+                                        onClick={this.revertFields} 
                                         className='px-4'
                                     >
                                         <i className="bi bi-arrow-counterclockwise me-2"></i>
@@ -306,7 +353,6 @@ class MeuTCC extends Component {
                                         onClick={() => this.closeModal('Deletion')} 
                                         className='px-4'
                                     >
-                                        <i className="bi bi-check-lg me-2"></i>
                                         Salvar
                                     </Button>
                                 </div>
