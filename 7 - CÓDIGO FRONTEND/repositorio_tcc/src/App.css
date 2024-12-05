@@ -83,3 +83,7 @@ label.required:after {
 	transform: scaleX(1);
 	transform-origin: bottom left;
 }
+
+html, body {
+  overflow-y: auto; 
+}
