@@ -17,6 +17,7 @@ class MeuTCC extends Component {
   
     state = {
         tccExistente: false,
+        tccId: '',
         originalresumo: '',
         resumo: '',
         originaltituloTcc: '',
@@ -107,11 +108,25 @@ class MeuTCC extends Component {
 
     clearState = () => {
         this.setState({
-            tituloTcc: '',
-            selectedAluno: null,
-            selectedCurso: null,
-            selectedOrientador: null,
+            tccExistente: false,
+            tccId: '',
+            originalresumo: '',
             resumo: '',
+            originaltituloTcc: '',
+            tituloTcc: '',
+            curso: '',
+            aluno: '',
+            orientador: '',
+            originalcategoria: '',
+            selectedCategoria: '',
+            originalsubcategoria: '',
+            selectedSubcategoria: '',
+            originalkeywords: '',
+            selectedKeywords: '',
+            changesMade: false,
+            optionsCategorias: [],
+            optionsSubcategorias: [],
+            optionsKeywords: []
         });
     }
 
@@ -129,65 +144,31 @@ class MeuTCC extends Component {
     submitTCCForm = (event) => {
         event.preventDefault();
         
-        if(!this.validateForm()) return;
-
         let data = {
             "titulo": this.state.tituloTcc,
-            "idAluno": this.state.selectedAluno.value,
-            "idOrientador": this.state.selectedOrientador.value,
-            "idCurso": this.state.selectedCurso.value
+            "resumo": this.state.resumo,
+            "categoria": this.state.selectedCategoria.value,
+            "subcategoria": this.state.selectedSubcategoria.value,
+            "keywords": this.state.selectedKeywords.map(keyword => keyword.value)
         }
 
-        if(this.state.resumo) {
-            data.resumo = this.state.resumo;
-        }
-
-        var request = null;
-        if(!this.state.toEditItem){
-            request = this.tccService.insert(data);
-        } else {
-            request = this.tccService.update(this.state.toEditItem.id, data);
-        }
-
-        // .then(response => {
-        //     if (response.ok) {
-        //         return response.json();
-        //     } else {
-        //         throw new Error('Erro na requisição: ' + response.status);
-        //     }
-        // })
-        // .then(data => {
-        request
+        this.tccService.update(this.state.tccId, data)
         .then(response => {
-            if(this.state.toEditItem){
-                this.setState({showModalEdit: false})
-                toast.success('TCC atualizado!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-            } else{
-                document.getElementById('btnCloseModal').click();
-                toast.success('TCC criado!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
+            if(response.status !== 200){ throw new Error('Erro na requisição: ' + response.status); }
+            toast.success('TCC atualizado!', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
             this.clearState();
-            this.fillList();
-            // Lógica para lidar com a resposta da API
+            this.getMyTcc();
         })
         .catch(error => {
-            toast.error('Ocorreu um erro', {
+            toast.error('Erro ao salvar', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -241,30 +222,13 @@ class MeuTCC extends Component {
     }
 
     render() {
-        return (
-        <div className="tcc-page bg-light min-vh-100">
-            <Navbar />
-            <ToastContainer/>
-            
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className='page-content container-fluid px-4'
-            >
-                <div className="row mb-4 mt-4">
-                    <div className="col-12">
-                        <h1 className='display-5 fw-bold mb-4 tittle tittleAfter'>Meu TCC</h1>
-                    </div>
-                </div>
 
-                {/* <motion.div 
-                    whileHover={{ scale: 1.01 }}
-                    className="card border-0 shadow-sm"
-                > */}
-                {/* </motion.div> */}
+        let document = 'null';
 
-                <div className='px-4'>
-                    <div className="document-container">
+        if(this.state.tccExistente) {
+            document = <>
+                <div className="document-container">
+                    <form onSubmit={this.submitTCCForm}>
                         <div className="mb-3 row">
                             <div className='row mb-4'>
                                 <div className="col-12">
@@ -356,7 +320,7 @@ class MeuTCC extends Component {
                                     </Button>
                                     <Button 
                                         variant="success" 
-                                        onClick={() => this.closeModal('Deletion')} 
+                                        type='submit'
                                         className='px-4'
                                     >
                                         Salvar
@@ -364,8 +328,50 @@ class MeuTCC extends Component {
                                 </div>
                             </div>
                         }
+                    </form>
 
+                </div>
+            </>
+        } else {
+            document = <>
+                <div className="text-center p-5 bg-white rounded shadow-sm col-12 col-md-8 col-lg-6 m-auto">
+                    <div className="mb-4">
+                        <i className="bi bi-journal-text display-1 text-info"></i>
                     </div>
+                    <h4 className="mb-3">Nenhum TCC Registrado</h4>
+                    <p className="text-muted mb-4">
+                        Parece que você ainda não possui um TCC registrado no sistema. 
+                        Para começar seu trabalho, entre em contato com o professor da disciplina 
+                        para realizar o cadastro do seu TCC.
+                    </p>
+                    <hr className="my-4"/>
+                    <div className="text-muted small">
+                        <i className="bi bi-info-circle me-2"></i>
+                        Dúvidas? Consulte a coordenação do seu curso para mais informações.
+                    </div>
+                </div>
+            </>
+        }
+
+        return (
+        <div className="tcc-page bg-light min-vh-100">
+            <Navbar />
+            <ToastContainer/>
+            
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='page-content container-fluid px-4'
+            >
+                <div className="row mb-4 mt-4">
+                    <div className="col-12">
+                        <h1 className='display-5 fw-bold mb-4 tittle tittleAfter'>Meu TCC</h1>
+                    </div>
+                </div>
+                {/* TODO: Remover o botão */}
+                <button title={"Apenas para teste"} onClick={() => this.setState({tccExistente: !this.state.tccExistente})}></button>
+                <div className='px-4'>
+                    {document}
                 </div>
             </motion.div>
 
