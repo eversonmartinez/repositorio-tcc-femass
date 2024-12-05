@@ -334,30 +334,30 @@ class Orientador extends Component {
                                 <div className='bg-white border rounded p-4'>
                                     <form onSubmit={this.resgister}>
                                         <div><h3 >Cadastro de Orientador</h3></div>
-                                        <div class="mb-3 justify-content-center">
-                                            <label for="exampleInputEmail1" class="form-label">Nome Completo</label>
-                                            <input type="text" class="form-control" name='nomeCompleto' id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required />
+                                        <div className="mb-3 justify-content-center">
+                                            <label for="exampleInputEmail1" className="form-label">Nome Completo</label>
+                                            <input type="text" className="form-control" name='nomeCompleto' id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required />
                                         </div>
-                                        <div class="mb-3 justify-content-center">
-                                            <label for="InputCPF" class="form-label">CPF</label>
+                                        <div className="mb-3 justify-content-center">
+                                            <label for="InputCPF" className="form-label">CPF</label>
                                             <InputMask mask="999.999.999-99"
-                                                type="text" class="form-control" name='cpf' id="cpf" onChange={this.handleChange} value={this.state.cpf} required >
+                                                type="text" className="form-control" name='cpf' id="cpf" onChange={this.handleChange} value={this.state.cpf} required >
                                                 {(inputProps) => <input {...inputProps} type="text" />}
                                             </InputMask>
                                         </div>
-                                        <div class="mb-3 justify-content-center">
-                                            <label for="InputTelefone" class="form-label">telefone</label>
+                                        <div className="mb-3 justify-content-center">
+                                            <label for="InputTelefone" className="form-label">telefone</label>
                                             <InputMask mask="(99)9999-99999"
-                                                type="text" class="form-control" name='telefone' id="telefone" onChange={this.handleChange} value={this.state.telefone} required >
+                                                type="text" className="form-control" name='telefone' id="telefone" onChange={this.handleChange} value={this.state.telefone} required >
                                                 {(inputProps) => <input {...inputProps} type="text" />}
                                             </InputMask>
                                         </div>
-                                        <div class="mb-3 justify-content-center">
-                                            <label for="exampleInputEmail1" class="form-label">Email</label>
-                                            <input type="email" class="form-control" name='email' id="email" required placeholder="email@email.com" onChange={this.handleChange} value={this.state.email} />
+                                        <div className="mb-3 justify-content-center">
+                                            <label for="exampleInputEmail1" className="form-label">Email</label>
+                                            <input type="email" className="form-control" name='email' id="email" required placeholder="email@email.com" onChange={this.handleChange} value={this.state.email} />
                                         </div>
-                                        <div class="mb-3 justify-content-center">
-                                            <button class="btn btn-dark" type='submit'>Criar</button>
+                                        <div className="mb-3 justify-content-center">
+                                            <button className="btn btn-dark" type='submit'>Criar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -366,8 +366,8 @@ class Orientador extends Component {
                     </div>
                     {/* Tabela de orientadores cadastrado */}
                     <h4 className="text-center">Lista de Orientadores</h4>
-                    <div class="container">
-                        <table class="table table-striped table-hover">
+                    <div className="container">
+                        <table className="table table-striped table-hover">
                             <tbody>
                                 <tr>
                                     <td className="text-center">Nome</td>
@@ -377,8 +377,8 @@ class Orientador extends Component {
                                     <tr key={this.state.listOrientador.id}>
                                         <td className="text-center">{data.nomeCompleto}</td>
                                         <td className="text-center">{data.email}</td>
-                                        <button class="btn btn-danger" onClick={() => this.beginDeletion(data)} >Deletar</button>
-                                        <button class="btn btn-warning" onClick={() => this.beginEdit(data)}>editar</button>
+                                        <button className="btn btn-danger" onClick={() => this.beginDeletion(data)} >Deletar</button>
+                                        <button className="btn btn-warning" onClick={() => this.beginEdit(data)}>editar</button>
                                     </tr>
                                 )) : <tr><td colSpan={4} className='text-center fw-bold'>Nenhum orientador encontrado</td></tr>}
                             </tbody>
@@ -421,12 +421,12 @@ class Orientador extends Component {
                                                 <div className="col-12">
                                                     <label htmlFor="inputName" className="col-12 col-form-label fw-bold">CPF</label>
                                                     <InputMask mask="999.999.999-99"
-                                                        type="text" class="form-control" name="cpf" id="cpf" onChange={this.handleChange} value={this.state.cpf} />
+                                                        type="text" className="form-control" name="cpf" id="cpf" onChange={this.handleChange} value={this.state.cpf} />
                                                 </div>
                                                 <div className="col-12">
                                                     <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Telefone</label>
                                                     <InputMask mask="(99)9999-99999"
-                                                        type="text" class="form-control" name="telefone" id="telefone" onChange={this.handleChange} value={this.state.telefone} />
+                                                        type="text" className="form-control" name="telefone" id="telefone" onChange={this.handleChange} value={this.state.telefone} />
                                                 </div>
                                                 <div className="col-12">
                                                     <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Email</label>
