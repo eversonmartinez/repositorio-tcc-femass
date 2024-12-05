@@ -330,7 +330,7 @@ class Orientador extends Component {
                     </div>
                     <div className='mt-5 mb-3 container-fluid d-flex flex-column justify-content-between'>
                         <div className='row justify-content-center'>
-                            <div className='col-10 col-md-6 col-lg-3'>
+                            <div className='col-10 col-md-6 col-lg-5 col-xl-4'>
                                 <div className='bg-white border rounded p-4'>
                                     <form onSubmit={this.resgister}>
                                         <div><h3 >Cadastro de Orientador</h3></div>
