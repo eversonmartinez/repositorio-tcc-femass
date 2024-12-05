@@ -329,22 +329,10 @@ class TCC extends Component {
     }
 
     beginView = (tcc) => { 
-        const url = window.server + "/tcc/" + tcc.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
+        this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.ok) {
-                    return response.json();
+                if(response.status = 200) {
+                    return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
                 }
@@ -359,22 +347,10 @@ class TCC extends Component {
 
         this.fillOptionsOrientadores();
 
-        const url = window.server + "/tcc/" + tcc.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
+        this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.ok) {
-                    return response.json();
+                if(response.status = 200) {
+                    return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
                 }
