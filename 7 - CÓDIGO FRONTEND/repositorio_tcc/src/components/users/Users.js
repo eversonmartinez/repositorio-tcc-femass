@@ -21,6 +21,7 @@ class Users extends Component {
         login: '',
         email: '',
         filterText: '',
+        checkboxChangePassword: false
     }
 
     columns = [
@@ -134,10 +135,10 @@ class Users extends Component {
             nomeCompleto: '',
             login: '',
             email: '',
-            checkboxNotifyEmail: true,
             toDeleteItem: null,
             toViewItem: null,
             toEditItem: null,
+            checkboxChangePassword: false
         });
     }
 
@@ -169,7 +170,6 @@ class Users extends Component {
             "nomeCompleto": this.state.nomeCompleto,
             "matricula": this.state.login,
             "email": this.state.email,
-            "mustChangePassword": true
         };
 
         const requestOptions = {
@@ -225,6 +225,7 @@ class Users extends Component {
         const data = {
             "nomeCompleto": this.state.nomeCompleto,
             "email": this.state.email,
+            "mustChangePassword": this.state.checkboxChangePassword
         };
 
         const requestOptions = {
@@ -239,7 +240,7 @@ class Users extends Component {
         fetch(url, requestOptions)
         .then((response) => {
             if (response.status === 200) {
-                this.closeModal('Registration');
+                this.closeModal('Edit');
                 toast.success('Usuário Atualizado!', {
                     position: "top-right",
                     autoClose: 2000,
@@ -543,7 +544,7 @@ class Users extends Component {
                         {this.state.toEditItem && <>
                             <div className="modal-body">
                                 <div className="container">
-                                        <div className="mb-3 row">
+                                        <div className="mb-1 row">
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Nome</label>
                                                 <input type="text" className="form-control" name="nomeCompleto" id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required/>
@@ -551,6 +552,12 @@ class Users extends Component {
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Email</label>
                                                 <textarea rows="3" className='form-control' style={{resize: "none"}} name="email" onChange={this.handleChange} value={this.state.email}></textarea>
+                                            </div>
+                                            <div className="col-12"> 
+                                                <div className="form-check form-switch mt-3">
+                                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
+                                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha no próximo login?</label>
+                                                </div>
                                             </div>
                                             {/* <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Role</label>
