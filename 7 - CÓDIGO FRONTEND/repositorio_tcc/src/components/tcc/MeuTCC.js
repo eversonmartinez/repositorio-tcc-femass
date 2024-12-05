@@ -18,8 +18,8 @@ class MeuTCC extends Component {
         tccExistente: false,
         originalresumo: '',
         resumo: '',
-        originaltituloTcc: 'macaco',
-        tituloTcc: 'macaco',
+        originaltituloTcc: '',
+        tituloTcc: '',
         curso: '',
         aluno: '',
         orientador: '',
@@ -199,6 +199,8 @@ class MeuTCC extends Component {
     }
 
     getMyTcc = () => {
+        //Método ainda não implementado no backend  
+
         // this.tccService.getMyTcc()
         //     .then((response) => {
         //         this.setState({
