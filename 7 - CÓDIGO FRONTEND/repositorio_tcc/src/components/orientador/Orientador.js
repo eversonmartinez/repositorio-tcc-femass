@@ -335,25 +335,25 @@ class Orientador extends Component {
                                     <form onSubmit={this.resgister}>
                                         <div><h3 >Cadastro de Orientador</h3></div>
                                         <div className="mb-3 justify-content-center">
-                                            <label for="exampleInputEmail1" className="form-label">Nome Completo</label>
+                                            <label htmlFor="exampleInputEmail1" className="form-label">Nome Completo</label>
                                             <input type="text" className="form-control" name='nomeCompleto' id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required />
                                         </div>
                                         <div className="mb-3 justify-content-center">
-                                            <label for="InputCPF" className="form-label">CPF</label>
+                                            <label htmlFor="InputCPF" className="form-label">CPF</label>
                                             <InputMask mask="999.999.999-99"
                                                 type="text" className="form-control" name='cpf' id="cpf" onChange={this.handleChange} value={this.state.cpf} required >
                                                 {(inputProps) => <input {...inputProps} type="text" />}
                                             </InputMask>
                                         </div>
                                         <div className="mb-3 justify-content-center">
-                                            <label for="InputTelefone" className="form-label">telefone</label>
+                                            <label htmlFor="InputTelefone" className="form-label">telefone</label>
                                             <InputMask mask="(99)9999-99999"
                                                 type="text" className="form-control" name='telefone' id="telefone" onChange={this.handleChange} value={this.state.telefone} required >
                                                 {(inputProps) => <input {...inputProps} type="text" />}
                                             </InputMask>
                                         </div>
                                         <div className="mb-3 justify-content-center">
-                                            <label for="exampleInputEmail1" className="form-label">Email</label>
+                                            <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
                                             <input type="email" className="form-control" name='email' id="email" required placeholder="email@email.com" onChange={this.handleChange} value={this.state.email} />
                                         </div>
                                         <div className="mb-3 justify-content-center">
