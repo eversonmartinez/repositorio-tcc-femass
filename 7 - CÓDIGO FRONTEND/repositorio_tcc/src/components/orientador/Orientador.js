@@ -388,7 +388,7 @@ class Orientador extends Component {
                     {/* Modal de exclusão */}
 
                     <Modal show={this.state.showModalDeletion} onHide={() => this.setState({ toDeleteItem: null, showModalDeletion: false })} centered>
-                        <Modal.Header className='bg-dark text-white' closeButton>
+                        <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                             <Modal.Title>Confirmar Exclusão</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>Tem certeza que deseja excluir o Orientador {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.nomeCompleto}</span>}?</Modal.Body>
@@ -405,7 +405,7 @@ class Orientador extends Component {
                     {/* Modal de Edição */}
 
                     <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
-                        <Modal.Header className='bg-dark text-white' closeButton>
+                        <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                             <Modal.Title>Editar {this.state.toEditItem && this.state.toEditItem.titulo}</Modal.Title>
                         </Modal.Header>
                         <form onSubmit={this.submitOrientadorForm}>

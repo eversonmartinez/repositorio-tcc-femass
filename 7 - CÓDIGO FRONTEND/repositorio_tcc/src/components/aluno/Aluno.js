@@ -495,7 +495,7 @@ class Aluno extends Component {
 
             <div className='modals'>
                 <Modal show={this.state.showModalRegistration} onHide={() => this.closeModal('Registration')} centered>
-                    <Modal.Header closeButton className='bg-dark text-white'>
+                    <Modal.Header closeButton className='bg-dark text-white' closeVariant='white'>
                         <Modal.Title>Novo Aluno</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.registerForm}>
@@ -537,7 +537,7 @@ class Aluno extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>Tem certeza que deseja excluir o aluno {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.nome}</span>}?</Modal.Body>
@@ -552,7 +552,7 @@ class Aluno extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
