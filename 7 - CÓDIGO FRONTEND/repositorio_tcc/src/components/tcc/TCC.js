@@ -239,6 +239,7 @@ class TCC extends Component {
         if(!this.state.toEditItem){
             request = this.tccService.insert(data);
         } else {
+            data.id = this.state.toEditItem.id;
             request = this.tccService.update(this.state.toEditItem.id, data);
         }
 
@@ -332,7 +333,7 @@ class TCC extends Component {
     beginView = (tcc) => { 
         this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.status = 200) {
+                if(response.status === 200) {
                     return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
@@ -350,7 +351,7 @@ class TCC extends Component {
 
         this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.status = 200) {
+                if(response.status === 200) {
                     return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
