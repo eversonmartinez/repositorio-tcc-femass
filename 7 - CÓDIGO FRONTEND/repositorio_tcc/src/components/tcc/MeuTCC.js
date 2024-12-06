@@ -194,7 +194,9 @@ class MeuTCC extends Component {
                 });
             })
             .catch((error) => {
-                console.error(error);
+                if(error.response.status === 404) {
+                    return;
+                }
                 toast.error('Erro ao carregar os dados', {
                     position: "top-right",
                     autoClose: 2000,
@@ -360,7 +362,8 @@ class MeuTCC extends Component {
                     </div>
                 </div>
                 {/* TODO: Remover o botão */}
-                <button title={"Apenas para teste"} onClick={() => this.setState({tccExistente: !this.state.tccExistente})}></button>
+                {/* <button title={"Apenas para teste"} onClick={() => this.setState({tccExistente: !this.state.tccExistente})}></button> */}
+
                 <div className='px-4'>
                     {document}
                 </div>
