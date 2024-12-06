@@ -11,6 +11,7 @@ import { TCCService } from '../../service/TCCService';
 import { AlunoService } from '../../service/AlunoService';
 import { OrientadorService } from '../../service/OrientadorService';
 import { CursoService } from '../../service/CursoService';
+import { Link } from 'react-router-dom'
 
 function withNavigate(Component) {
     return (props) => {
@@ -569,33 +570,42 @@ class TCC extends Component {
                                                         <Select
                                                             className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
-                                                            defaultValue={defaultSelectOption}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectCurso"
                                                             options={this.state.optionsCursos}
                                                             noOptionsMessage={() => "Não há cursos cadastrados"}
+                                                            placeholder="Selecione.."
                                                             onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption, isCursoInvalid: !selectedOption })}
                                                             value={this.state.selectedCurso}
                                                         />
                                                         {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
                                                     </div>
-                                                    <div className="col-12">
+                                                    <div className="col-11">
                                                         <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Aluno</label>
                                                         <Select
                                                             className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
-                                                            defaultValue={defaultSelectOption}
-                                                            // isLoading={isLoading}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectAluno"
                                                             options={this.state.optionsAlunos}
                                                             noOptionsMessage={() => "Não há alunos cadastrados"}
+                                                            placeholder="Selecione.."
                                                             onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption, isAlunoInvalid: !selectedOption })}
                                                             value={this.state.selectedAluno}
                                                         />
                                                         {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
+                                                    </div>
+                                                    <div className='col-1 d-flex align-items-end mb-1'>
+                                                        <Link 
+                                                            to="/alunos" 
+                                                            onClick={() => document.getElementById('btnCloseModal').click()}
+                                                            className="btn btn-outline-primary btn-sm"
+                                                            title="Cadastrar novo aluno"
+                                                        >
+                                                            <i className="bi bi-plus-circle d-flex align-items-center p-1"></i>
+                                                        </Link>
                                                     </div>
                                                     <div className="col-12">
                                                         <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Orientador</label>
@@ -603,12 +613,12 @@ class TCC extends Component {
                                                             className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
                                                             defaultValue={defaultSelectOption}
-                                                            // isLoading={isLoading}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectOrientador"
                                                             options={this.state.optionsOrientadores}
                                                             noOptionsMessage={() => "Não há orientadores cadastrados"}
+                                                            placeholder="Selecione.."
                                                             value={this.state.selectedOrientador}
                                                             onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
                                                         />
