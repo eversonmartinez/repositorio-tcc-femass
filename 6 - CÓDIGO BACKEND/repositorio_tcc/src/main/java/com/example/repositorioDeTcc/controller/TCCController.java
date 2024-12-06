@@ -2,13 +2,13 @@ package com.example.repositorioDeTcc.controller;
 
 import com.example.repositorioDeTcc.dto.TCCDTO;
 import com.example.repositorioDeTcc.dto.TCCMinDTO;
+import com.example.repositorioDeTcc.dto.TCCUpdateDTO;
 import com.example.repositorioDeTcc.service.TCCService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +32,12 @@ public class TCCController {
         return ResponseEntity.ok().body(result);
     }
 
+    @GetMapping(value = "/my" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TCCDTO> findMine(Principal connectedUser){
+        TCCDTO result = service.findMine(connectedUser);
+        return ResponseEntity.ok().body(result);
+    }
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TCCDTO> create(@RequestBody TCCDTO tcc){
 
@@ -40,10 +46,10 @@ public class TCCController {
     }
 
     @PutMapping(value = "/{id}" , produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TCCDTO> update(@PathVariable UUID id, @RequestBody TCCDTO tcc){
+    public ResponseEntity<TCCDTO> update(@PathVariable UUID id, @RequestBody TCCUpdateDTO tcc){
 
-        tcc = service.update(id, tcc);
-        return ResponseEntity.ok().body(tcc);
+        TCCDTO updateTcc = service.update(id, tcc);
+        return ResponseEntity.ok().body(updateTcc);
 
     }
 

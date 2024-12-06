@@ -104,4 +104,20 @@ public class CustomExceptionHandler{
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(MatriculaNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleMatriculaNotFoundException(MatriculaNotFoundException ex,
+                                                                                    WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TCCNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleTCCNotFoundException(TCCNotFoundException ex,
+                                                                                    WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
 }

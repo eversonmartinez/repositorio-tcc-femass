@@ -17,19 +17,14 @@ class MeuTCC extends Component {
   
     state = {
         tccExistente: false,
-        tccId: '',
-        originalresumo: '',
+        tccOriginal: {},
         resumo: '',
-        originaltituloTcc: '',
         tituloTcc: '',
         curso: '',
         aluno: '',
         orientador: '',
-        originalcategoria: '',
         selectedCategoria: '',
-        originalsubcategoria: '',
         selectedSubcategoria: '',
-        originalkeywords: '',
         selectedKeywords: '',
         changesMade: false,
         optionsCategorias: [],
@@ -75,7 +70,7 @@ class MeuTCC extends Component {
                     value: categoria.id,
                     label: categoria.nomeCategoria
                 }));
-                this.setState({ optionsCategorias }, console.log(this.state.optionsCategorias));
+                this.setState({ optionsCategorias });
             });
     }
 
@@ -109,19 +104,13 @@ class MeuTCC extends Component {
     clearState = () => {
         this.setState({
             tccExistente: false,
-            tccId: '',
-            originalresumo: '',
             resumo: '',
-            originaltituloTcc: '',
             tituloTcc: '',
             curso: '',
             aluno: '',
             orientador: '',
-            originalcategoria: '',
             selectedCategoria: '',
-            originalsubcategoria: '',
             selectedSubcategoria: '',
-            originalkeywords: '',
             selectedKeywords: '',
             changesMade: false,
             optionsCategorias: [],
@@ -132,11 +121,11 @@ class MeuTCC extends Component {
 
     revertFields = () => {
         this.setState({
-            tituloTcc: this.state.originaltituloTcc,
-            resumo: this.state.originalresumo,
-            selectedCategoria: this.state.originalcategoria,
-            selectedSubcategoria: this.state.originalsubcategoria,
-            selectedKeywords: this.state.originalkeywords,
+            tituloTcc: this.state.tccOriginal.titulo,
+            resumo: this.state.tccOriginal.resumo || '',
+            selectedCategoria: this.state.tccOriginal.categoria,
+            selectedSubcategoria: this.state.tccOriginal.subcategoria,
+            selectedKeywords: this.state.tccOriginal.keywords,
             changesMade: false
         });
     }
@@ -147,12 +136,17 @@ class MeuTCC extends Component {
         let data = {
             "titulo": this.state.tituloTcc,
             "resumo": this.state.resumo,
-            "categoria": this.state.selectedCategoria.value,
-            "subcategoria": this.state.selectedSubcategoria.value,
-            "keywords": this.state.selectedKeywords.map(keyword => keyword.value)
+            "id": this.state.tccOriginal.id,
+            "idAluno": this.state.tccOriginal.idAluno,
+            "idOrientador": this.state.tccOriginal.idOrientador,
+            "idCurso": this.state.tccOriginal.idCurso
         }
 
-        this.tccService.update(this.state.tccId, data)
+        if(this.state.selectedCategoria && this.state.selectedCategoria.value) {data.categoria = this.state.selectedCategoria.value;}
+        if(this.state.selectedSubcategoria && this.state.selectedSubcategoria.value) {data.subcategoria = this.state.selectedSubcategoria.value;}
+        if(this.state.selectedKeywords && this.state.selectedKeywords.length > 0) {data.keywords = this.state.selectedKeywords.map(keyword => keyword.value);}
+
+        this.tccService.update(this.state.tccOriginal.id, data)
         .then(response => {
             if(response.status !== 200){ throw new Error('Erro na requisição: ' + response.status); }
             toast.success('TCC atualizado!', {
@@ -184,36 +178,33 @@ class MeuTCC extends Component {
     getMyTcc = () => {
         //Método ainda não implementado no backend  
 
-        // this.tccService.getMyTcc()
-        //     .then((response) => {
-        //         this.setState({
-        //             tccExistente: true,
-        //             originaltituloTcc: response.data.titulo,
-        //             tituloTcc: response.data.titulo,
-        //             originalresumo: response.data.resumo,
-        //             resumo: response.data.resumo,
-        //             curso: response.data.curso,
-        //             aluno: response.data.aluno,
-        //             orientador: response.data.orientador,
-        //             originalcategoria: response.data.categoria,
-        //             selectedCategoria: response.data.categoria,
-        //             originalsubcategoria: response.data.subcategoria,
-        //             selectedSubcategoria: response.data.subcategoria,
-        //             originalkeywords: response.data.keywords,
-        //             keywords: response.data.keywords
-        //         });
-        //     })
-        //     .catch((error) => {
-        //         toast.error('Erro ao carregar os dados', {
-        //             position: "top-right",
-        //             autoClose: 2000,
-        //             hideProgressBar: false,
-        //             closeOnClick: true,
-        //             pauseOnHover: true,
-        //             draggable: true,
-        //             progress: undefined,
-        //             });
-        //     });
+        this.tccService.getMyTcc()
+            .then((response) => {
+                this.setState({
+                    tccExistente: true,
+                    tccOriginal: response.data,
+                    tituloTcc: response.data.titulo,
+                    resumo: response.data.resumo || '',
+                    curso: response.data.nomeCurso,
+                    aluno: response.data.nomeCompletoAluno,
+                    orientador: response.data.nomeCompletoOrientador,
+                    selectedCategoria: response.data.categoria,
+                    selectedSubcategoria: response.data.subcategoria,
+                    keywords: response.data.keywords
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                toast.error('Erro ao carregar os dados', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    });
+            });
     }
 
     componentDidMount() {
@@ -245,17 +236,17 @@ class MeuTCC extends Component {
                             <div className='row mb-3'>
                                 <div className="col-12">
                                     <label htmlFor="inputCourse" className="form-label fw-bold">Curso</label>
-                                    <input type="text" id="inputCourse" disabled className='form-control' />
+                                    <input type="text" id="inputCourse" value={this.state.curso} disabled className='form-control' />
                                 </div>
                             </div>
                             <div className='row mb-3'>
                                 <div className="col-sm-12 col-md-6 mb-sm-3 mb-md-0">
                                     <label htmlFor="inputStudent" className="form-label fw-bold">Autor</label>
-                                    <input type="text" id="inputStudent" className="form-control" disabled />
+                                    <input type="text" id="inputStudent" value={this.state.aluno} className="form-control" disabled />
                                 </div>
                                 <div className="col-sm-12 col-md-6">
                                     <label htmlFor="inputOrientador" className="form-label fw-bold">Orientador</label>
-                                    <input type="text" id="inputOrientador" className="form-control" disabled />
+                                    <input type="text" id="inputOrientador" value={this.state.orientador} className="form-control" disabled />
                                 </div>
                             </div>
                             <div className='row mb-3'>
