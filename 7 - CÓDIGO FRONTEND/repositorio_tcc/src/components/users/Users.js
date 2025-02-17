@@ -3,14 +3,12 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
-import '../../assets/css/tcc.css';
 
 class Users extends Component {
   
     state = {
         users: [],
         filteredData: [],
-        checkboxChangePassword: true,
         checkboxNotifyEmail: true,
         toDeleteItem: null,
         toViewItem: null,
@@ -22,9 +20,8 @@ class Users extends Component {
         nomeCompleto: '',
         login: '',
         email: '',
-        password: '',
-        passwordConfirm: '',
         filterText: '',
+        checkboxChangePassword: false
     }
 
     columns = [
@@ -98,9 +95,7 @@ class Users extends Component {
             this.handleCheckboxChange(event);
             return;
         }
-        if(event.target.name.startsWith('password')) callback = this.validatePassword;
         if(event.target.name === 'filterText') callback = this.applyFilters;
-
         this.setState({ [event.target.name]: event.target.value }, callback);
     };
 
@@ -127,26 +122,12 @@ class Users extends Component {
         this.setState({ showModalRegistration: true });
     }
 
-    validatePassword = () => {
-        if(!this.state.password || !this.state.passwordConfirm) return false;
-        const passwordConfirmElement = document.getElementById('passwordConfirm');
-        if(this.state.password !== this.state.passwordConfirm) {
-          passwordConfirmElement.setCustomValidity('As senhas não conferem');
-          passwordConfirmElement.classList.add('is-invalid');
-        } else {
-            passwordConfirmElement.setCustomValidity('');
-            passwordConfirmElement.classList.remove('is-invalid');
-        }
-
-        return passwordConfirmElement.checkValidity();
-    }
-
     validateForm = () => {
-        const { nomeCompleto, login, email, password, passwordConfirm } = this.state;
-        if (!nomeCompleto || !login || !email || !password || !passwordConfirm) {
+        const { nomeCompleto, login, email } = this.state;
+        if (!nomeCompleto || !login || !email) {
             return false;
         }
-        return this.validatePassword();
+        return true;
     }
 
     clearState = () => {
@@ -154,13 +135,10 @@ class Users extends Component {
             nomeCompleto: '',
             login: '',
             email: '',
-            password: '',
-            passwordConfirm: '',
-            checkboxChangePassword: true,
-            checkboxNotifyEmail: true,
             toDeleteItem: null,
             toViewItem: null,
             toEditItem: null,
+            checkboxChangePassword: false
         });
     }
 
@@ -192,8 +170,6 @@ class Users extends Component {
             "nomeCompleto": this.state.nomeCompleto,
             "matricula": this.state.login,
             "email": this.state.email,
-            "password": this.state.password,
-            "mustChangePassword": this.state.checkboxChangePassword || false
         };
 
         const requestOptions = {
@@ -248,10 +224,8 @@ class Users extends Component {
 
         const data = {
             "nomeCompleto": this.state.nomeCompleto,
-            // "matricula": this.state.login,
             "email": this.state.email,
-            // "password": this.state.password,
-            // "mustChangePassword": this.state.checkboxChangePassword || false
+            "mustChangePassword": this.state.checkboxChangePassword
         };
 
         const requestOptions = {
@@ -266,7 +240,7 @@ class Users extends Component {
         fetch(url, requestOptions)
         .then((response) => {
             if (response.status === 200) {
-                this.closeModal('Registration');
+                this.closeModal('Edit');
                 toast.success('Usuário Atualizado!', {
                     position: "top-right",
                     autoClose: 2000,
@@ -302,14 +276,9 @@ class Users extends Component {
 
     delete = () => {
 
-        console.log(this.state.toDeleteItem)
-        
         const url = window.server + "/users/" + this.state.toDeleteItem.id;
 
         const token = sessionStorage.getItem('token');
-
-        console.log(token)
-        console.log(url)
 
         const requestOptions = {
             method: 'DELETE',
@@ -351,7 +320,6 @@ class Users extends Component {
 
     beginDeletion = (usuarios) => {
         this.setState({ toDeleteItem: usuarios, showModalDeletion: true });
-        // console.log(this.state.showModalDeletion)
 	}
 
     beginView = (aluno) => { 
@@ -385,8 +353,6 @@ class Users extends Component {
     beginEdit = (aluno) => { 
 
         const url = window.server + "/users/" + aluno.id;
-
-        console.log(url)
 
         const token = sessionStorage.getItem('token');
 
@@ -486,15 +452,15 @@ class Users extends Component {
 
             <div className='modals'>
                 <Modal show={this.state.showModalRegistration} onHide={() => this.closeModal('Registration')} centered>
-                    <Modal.Header closeButton className='bg-dark text-white'>
+                    <Modal.Header closeButton className='bg-dark text-white' closeVariant='white'>
                         <Modal.Title>Novo Usuário</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.registerForm}>
                     <Modal.Body>
                             <div className="mb-3 row justify-content-center">  
                                 <div className='col-12'>
-                                <label htmlFor="completeName" className='required'>Nome Completo</label>
-                                <input type="text" className="form-control" id="completeName" name="completeName" required onChange={this.handleChange}></input>
+                                <label htmlFor="nomeCompleto" className='required'>Nome Completo</label>
+                                <input type="text" className="form-control" id="nomeCompleto" name="nomeCompleto" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
                             <div className="mb-3 row justify-content-center">
@@ -508,29 +474,6 @@ class Users extends Component {
                                 <label htmlFor="email" className='required'>E-mail</label>
                                 <input type="email" className="form-control" id="email" name="email" required placeholder="email@email.com" onChange={this.handleChange}></input>
                                 </div>
-                            </div>
-                            <div className="mb-4 row justify-content-center">
-                                <div className='col-12'>
-                                <label htmlFor="password" className="col-form-label required">Senha</label>
-                                <input type="password" className="form-control" id="password" name="password" required onChange={this.handleChange}></input>
-                                </div>
-                            </div>
-                            <div className="mb-4 row justify-content-center">
-                                <div className='col-12'>
-                                <label htmlFor="passwordConfirm" className="col-form-label required">Confirme a senha</label>
-                                <input type="password" className="form-control" id="passwordConfirm" name="passwordConfirm" onChange={this.handleChange} required></input>
-                                <div className="invalid-feedback">As senhas não conferem</div>
-                                </div>
-                            </div>
-                            <div className="px-3"> 
-                                <div className="form-check form-switch mb-3">
-                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
-                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha </label>
-                                </div>
-                                {/* <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" value="" name="checkboxNotifyEmail" checked={this.state.checkboxNotifyEmail} onChange={this.handleChange}/>
-                                    <label class="form-check-label" htmlFor=""> Notificar por e-mail </label>
-                                </div> */}
                             </div>
                             
                     </Modal.Body>
@@ -546,7 +489,7 @@ class Users extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>Tem certeza que deseja excluir o aluno {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.nome}</span>}?</Modal.Body>
@@ -561,7 +504,7 @@ class Users extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.nome}</>}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -593,7 +536,7 @@ class Users extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalEdit} onHide={() => this.closeModal('Edit')} centered size='xl'>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Editar {this.state.toEditItem && <>{this.state.toEditItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.registerFormAtualizar}>
@@ -601,7 +544,7 @@ class Users extends Component {
                         {this.state.toEditItem && <>
                             <div className="modal-body">
                                 <div className="container">
-                                        <div className="mb-3 row">
+                                        <div className="mb-1 row">
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-4 col-form-label fw-bold required">Nome</label>
                                                 <input type="text" className="form-control" name="nomeCompleto" id="nomeCompleto" onChange={this.handleChange} value={this.state.nomeCompleto} required/>
@@ -609,6 +552,12 @@ class Users extends Component {
                                             <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Email</label>
                                                 <textarea rows="3" className='form-control' style={{resize: "none"}} name="email" onChange={this.handleChange} value={this.state.email}></textarea>
+                                            </div>
+                                            <div className="col-12"> 
+                                                <div className="form-check form-switch mt-3">
+                                                    <input className="form-check-input" type="checkbox" value="" name="checkboxChangePassword" checked={this.state.checkboxChangePassword} onChange={this.handleChange} />
+                                                    <label className="form-check-label" htmlFor=""> Usuário deve trocar a senha no próximo login?</label>
+                                                </div>
                                             </div>
                                             {/* <div className="col-12">
                                                 <label htmlFor="inputName" className="col-12 col-form-label fw-bold">Role</label>

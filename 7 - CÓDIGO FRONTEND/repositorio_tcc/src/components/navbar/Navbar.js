@@ -8,6 +8,14 @@ export default class Navbar extends Component {
     window.location.href = '/login';
   }
 
+  state = {
+    currentPageLink: 'home'
+  }
+
+  componentDidMount() {
+    this.setState({currentPageLink: window.location.pathname.split('/')[1]});
+  }
+
   render() {
     return (
         <nav className="navbar navbar-dark fixed-top">
@@ -23,22 +31,22 @@ export default class Navbar extends Component {
               <div className="offcanvas-body">
                 <ul className="navbar-nav justify-content-end flex-grow-1 pe-3 fs-5">
                   <li className="nav-item">
-                    <Link to="/home" className='nav-link active text-white' id="linkToHome">Início</Link>
+                    <Link to="/home" className={`nav-link ${this.state.currentPageLink === 'home' ? 'active' : ''}`} id="linkToHome">Início</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/alunos" className='nav-link active' id="linkToHome">Alunos</Link>
+                    <Link to="/alunos" className={`nav-link ${this.state.currentPageLink === 'alunos' ? 'active' : ''}`}>Alunos</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/orientadores" className='nav-link active' id="linkToHome">Orientadores</Link>
+                    <Link to="/orientadores" className={`nav-link ${this.state.currentPageLink === 'orientadores' ? 'active' : ''}`}>Orientadores</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/tcc" className='nav-link active' id="linkToHome">Trabalhos de Conclusão</Link>
+                    <Link to="/tcc" className={`nav-link ${this.state.currentPageLink === 'tcc' ? 'active' : ''}`}>Trabalhos de Conclusão</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/home" className='nav-link active' id="linkToHome">Meu TCC</Link>
+                    <Link to="/meu-tcc" className={`nav-link ${this.state.currentPageLink === 'meu-tcc' ? 'active' : ''}`}>Meu TCC</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/users" className='nav-link active' id="linkToHome">Usuários</Link>
+                    <Link to="/users" className={`nav-link ${this.state.currentPageLink === 'users' ? 'active' : ''}`}>Usuários</Link>
                   </li>
                 </ul>
               </div>

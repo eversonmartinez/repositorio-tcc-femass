@@ -1,5 +1,6 @@
 package com.example.repositorioDeTcc.model;
 
+import com.example.repositorioDeTcc.dto.RegisterUserDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,6 +32,7 @@ public class User implements Serializable, UserDetails {
     @Column(unique = true)
     private String matricula;
 
+    @Setter
     private String password;
 
     private Boolean enabled;
@@ -51,13 +53,27 @@ public class User implements Serializable, UserDetails {
         this.mustChangePassword = true;
     }
 
+    public User(RegisterUserDTO dadosDto){
+        this.nomeCompleto = dadosDto.nomeCompleto();
+        this.matricula = dadosDto.matricula();
+        this.email = dadosDto.email();
+        this.role = dadosDto.role();
+        this.enabled = true;
+        if(dadosDto.mustChangePassword()!=null){
+            this.mustChangePassword = dadosDto.mustChangePassword();
+        }else {
+            this.mustChangePassword = true;
+        }
+        if(dadosDto.role()!=null){
+            this.role = dadosDto.role();
+        }else{
+            this.role = Role.USER;
+        }
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override

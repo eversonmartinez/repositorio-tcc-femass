@@ -9,6 +9,7 @@ import java.io.Serializable;
 public record RegisterUserDTO(@NotBlank String nomeCompleto,
                               @NotBlank String email,
                               @NotBlank String matricula,
-                              Role role )
+                              Role role,
+                              Boolean mustChangePassword)
         implements Serializable {
 }

@@ -8,4 +8,7 @@ import java.util.UUID;
 
 public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     public List<Aluno> findAllByAtivoIsTrue();
+
+    public Boolean existsByMatriculaOrEmail(String matricula, String email);
+
 }

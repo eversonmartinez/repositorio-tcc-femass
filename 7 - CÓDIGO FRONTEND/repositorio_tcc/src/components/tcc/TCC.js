@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../navbar/Navbar';
-import '../../assets/css/tcc.css';
+import '../../assets/css/meutcc.css';
 import Select from 'react-select'
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TCCService } from '../../service/TCCService';
 import { AlunoService } from '../../service/AlunoService';
 import { OrientadorService } from '../../service/OrientadorService';
+import { CursoService } from '../../service/CursoService';
+import { Link } from 'react-router-dom'
 
 function withNavigate(Component) {
     return (props) => {
@@ -27,12 +29,7 @@ class TCC extends Component {
         filteredItems: [],
         optionsAlunos: [],
         optionsOrientadores: [],
-        optionsCursos: [
-            {value: 1, label: 'Sistemas de Informação'},
-            {value: 2, label: 'Administração'},
-            {value: 3, label: 'Engenharia de Produção'},
-            {value: 4, label : 'Matemática'},
-        ],
+        optionsCursos: [],
         isCursoInvalid: false,
         selectedCurso: null,
         isAlunoInvalid: false,
@@ -55,6 +52,7 @@ class TCC extends Component {
     tccService = new TCCService();
     alunoService = new AlunoService();
     orientadorService = new OrientadorService();
+    cursoService = new CursoService();
 
     columns = [
         {
@@ -182,9 +180,21 @@ class TCC extends Component {
             })
     }
 
+    fillOptionsCursos = () => {
+        this.cursoService.listAll()
+            .then((response) => {
+                    const optionsCursos = response.data.map(curso => ({
+                        value: curso.id,
+                        label: curso.nome
+                    }));
+                    this.setState({ optionsCursos });
+            })
+    }
+
     beginInsertion = () => {
         this.fillOptionsAlunos();
         this.fillOptionsOrientadores();
+        this.fillOptionsCursos();
     }
 
     validateForm = () => {
@@ -229,6 +239,7 @@ class TCC extends Component {
         if(!this.state.toEditItem){
             request = this.tccService.insert(data);
         } else {
+            data.id = this.state.toEditItem.id;
             request = this.tccService.update(this.state.toEditItem.id, data);
         }
 
@@ -320,22 +331,10 @@ class TCC extends Component {
     }
 
     beginView = (tcc) => { 
-        const url = window.server + "/tcc/" + tcc.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
+        this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.ok) {
-                    return response.json();
+                if(response.status === 200) {
+                    return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
                 }
@@ -350,22 +349,10 @@ class TCC extends Component {
 
         this.fillOptionsOrientadores();
 
-        const url = window.server + "/tcc/" + tcc.id;
-
-        const token = sessionStorage.getItem('token');
-
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token, // Adicione o token JWT
-                'Content-Type': 'application/json'
-            }
-        };
-
-        fetch(url,requestOptions)
+        this.tccService.findById(tcc.id)
             .then((response) => {
-                if(response.ok) {
-                    return response.json();
+                if(response.status === 200) {
+                    return response.data;
                 } else{
                     throw new Error('Erro na requisição: ' + response.status);
                 }
@@ -376,7 +363,7 @@ class TCC extends Component {
                     showModalEdit: true,
                     tituloTcc: data.titulo,
                     resumo: data.resumo,
-                    selectedCurso: { value: data.idCurso, label: data.idCurso },
+                    selectedCurso: { value: data.idCurso, label: data.nomeCurso },
                     selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
                     selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } });
             })
@@ -426,13 +413,24 @@ class TCC extends Component {
                         <motion.button 
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="btn btn-primary btn-lg d-flex align-items-center new-tcc-button"
+                            className="btn btn-primary btn-lg d-flex align-items-center new-tcc-button styled-button"
                             data-bs-toggle="modal" 
                             data-bs-target="#insertionModal" 
                             onClick={this.beginInsertion}
                         >
                             <i className="bi bi-file-earmark-plus fs-4 me-2"></i>
                             <span>Novo TCC</span>
+                        </motion.button>
+                    </div>
+                    <div className="col-auto">
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="btn btn-secondary btn-lg d-flex align-items-center categories-button styled-button"
+                            onClick={() => this.props.navigate('/categorias')}
+                        >
+                            <i className="bi bi-filter-square fs-4 me-2"></i>
+                            <span>Categorias</span>
                         </motion.button>
                     </div>
                 </div>
@@ -573,33 +571,42 @@ class TCC extends Component {
                                                         <Select
                                                             className={`basic-single ${this.state.isCursoInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
-                                                            defaultValue={defaultSelectOption}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectCurso"
                                                             options={this.state.optionsCursos}
                                                             noOptionsMessage={() => "Não há cursos cadastrados"}
+                                                            placeholder="Selecione.."
                                                             onChange={(selectedOption) => this.setState({ selectedCurso: selectedOption, isCursoInvalid: !selectedOption })}
                                                             value={this.state.selectedCurso}
                                                         />
                                                         {this.state.isCursoInvalid && <div className="invalid-feedback">Por favor, selecione um curso.</div>}
                                                     </div>
-                                                    <div className="col-12">
+                                                    <div className="col-11">
                                                         <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Aluno</label>
                                                         <Select
                                                             className={`basic-single ${this.state.isAlunoInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
-                                                            defaultValue={defaultSelectOption}
-                                                            // isLoading={isLoading}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectAluno"
                                                             options={this.state.optionsAlunos}
                                                             noOptionsMessage={() => "Não há alunos cadastrados"}
+                                                            placeholder="Selecione.."
                                                             onChange={(selectedOption) => this.setState({ selectedAluno: selectedOption, isAlunoInvalid: !selectedOption })}
                                                             value={this.state.selectedAluno}
                                                         />
                                                         {this.state.isAlunoInvalid && <div className="invalid-feedback">Por favor, selecione um aluno.</div>}
+                                                    </div>
+                                                    <div className='col-1 d-flex align-items-end mb-1'>
+                                                        <Link 
+                                                            to="/alunos" 
+                                                            onClick={() => document.getElementById('btnCloseModal').click()}
+                                                            className="btn btn-outline-primary btn-sm"
+                                                            title="Cadastrar novo aluno"
+                                                        >
+                                                            <i className="bi bi-plus-circle d-flex align-items-center p-1"></i>
+                                                        </Link>
                                                     </div>
                                                     <div className="col-12">
                                                         <label htmlFor="inputName" className="col-12 col-form-label fw-bold required">Orientador</label>
@@ -607,12 +614,12 @@ class TCC extends Component {
                                                             className={`basic-single ${this.state.isOrientadorInvalid ? 'is-invalid' : ''}`}
                                                             classNamePrefix="select"
                                                             defaultValue={defaultSelectOption}
-                                                            // isLoading={isLoading}
                                                             isClearable={true}
                                                             isSearchable={true}
                                                             name="selectOrientador"
                                                             options={this.state.optionsOrientadores}
                                                             noOptionsMessage={() => "Não há orientadores cadastrados"}
+                                                            placeholder="Selecione.."
                                                             value={this.state.selectedOrientador}
                                                             onChange={(selectedOption) => this.setState({ selectedOrientador: selectedOption, isOrientadorInvalid: !selectedOption })}
                                                         />
@@ -668,15 +675,15 @@ class TCC extends Component {
                                     </div>
                                     <div>
                                         <h5>Autor:</h5>
-                                        <p>{this.state.toViewItem.idAluno}</p>
+                                        <p>{this.state.toViewItem.nomeCompletoAluno}</p>
                                     </div>
                                     <div>
                                         <h5>Autor:</h5>
-                                        <p>{this.state.toViewItem.idOrientador}</p>
+                                        <p>{this.state.toViewItem.nomeCompletoOrientador}</p>
                                     </div>
                                     <div>
                                         <h5>Curso:</h5>
-                                        <p>{this.state.toViewItem.idCurso}</p>
+                                        <p>{this.state.toViewItem.nomeCurso}</p>
                                     </div>
                                     </>
                                 }

@@ -3,6 +3,8 @@ import Navbar from '../navbar/Navbar';
 import { Button, Modal } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
+import { AlunoService } from '../../service/AlunoService';
+import { TranslationService } from '../../service/TranslationService';
 
 class Aluno extends Component {
   
@@ -24,10 +26,11 @@ class Aluno extends Component {
         showModalEdit: false,
         showModalRegistration: false,
         showModalView: false,
+        showModalUpload: false,
         nomeCompleto: null,
-        email: null,
         telefone: null,
         matricula: null,
+        uploadAlunos: null
     }
 
     columns = [
@@ -43,18 +46,6 @@ class Aluno extends Component {
             sortable: true,
              width: '40%'
           },
-        //   {
-        //     name: 'Email',
-        //     selector: user => user.email,
-        //     sortable: true,
-        //      width: '25%'
-        //   },
-        //   {
-        //     name: 'Telefone',
-        //     selector: user => user.telefone,
-        //     sortable: true,
-        //      width: '25%'
-        //   },
         {
             name: 'Ações',
             cell: user => <>
@@ -77,6 +68,8 @@ class Aluno extends Component {
         },
     };
 
+    alunoService = new AlunoService();
+
     handleCheckboxChange = (event) => {
         this.setState({ [event.target.name]: event.target.checked });
     };
@@ -94,30 +87,44 @@ class Aluno extends Component {
         }));
     }
 
+    validateFile = (file) => {
+        if(!file) return false;
+        const validTypes = [
+            'text/csv', 
+            'application/vnd.ms-excel',
+            'application/csv',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/excel'
+        ];
+        if(!validTypes.includes(file.type)) {
+            return false;
+        }
+        return true;
+    }
+
     handleChange = (event) => {
+        if(event.target.name.startsWith('upload')) {
+
+            this.setState({ [event.target.name]: null });
+            if(!this.validateFile(event.target.files[0])){
+                event.target.focus();
+                event.target.classList.add('is-invalid');
+                event.target.addEventListener('input', function(){
+                    event.target.classList.remove('is-invalid');
+                });
+                return;
+            }
+            this.setState({ [event.target.name]: event.target.files[0] });
+            return;
+        }
         if(event.target.name.startsWith('filter')) this.applyFilters();
         this.setState({ [event.target.name]: event.target.value });
     };
-    // handleChange = (event) => {
-    //     //definição de funções callbacks, caso necessárias
-    //     let callback = null;
-    //     //se o evento for de checkbox, as alterações prosseguirão a partir de outra função
-    //     if(event.target.name.startsWith('checkbox')) {
-    //         this.handleCheckboxChange(event);
-    //         return;
-    //     }
-    //     if(event.target.name.startsWith('password')) callback = this.validatePassword;
-    //     if(event.target.name === 'filterText') callback = this.applyFilters;
-
-    //     this.setState({ [event.target.name]: event.target.value }, callback);
-    // };
 
     fillList = () => {
         const url = window.server + "/alunos";
 
         const token = sessionStorage.getItem('token');
-
-        console.log(token)
 
         const requestOptions = {
             method: 'GET',
@@ -131,12 +138,14 @@ class Aluno extends Component {
             .then((response) => response.json())
                 .then((data) => this.setState({users: data, filteredData: data}));
 
-        console.log(this.state.filteredData)
-        console.log(this.state.data)
     }
 
     beginRegistration = () => {
         this.setState({ showModalRegistration: true });
+    }
+    
+    beginUpload = () => {
+        this.setState({ showModalUpload: true });
     }
 
     beginEdit = (aluno) => { 
@@ -168,11 +177,6 @@ class Aluno extends Component {
                     nomeCompleto: data.nomeCompleto,
                     email: data.email,
                     telefone: data.telefone,
-                    // tituloTcc: data.titulo,
-                    // resumo: data.resumo,
-                    // // selectedCurso: { value: data.idCurso, label: data.idCurso },
-                    // // selectedAluno: { value: data.idAluno, label: data.nomeCompletoAluno },
-                    // // selectedOrientador: { value: data.idOrientador, label: data.nomeCompletoOrientador } 
                 
                 });
             })
@@ -195,11 +199,6 @@ class Aluno extends Component {
     }
 
     validateForm = () => {
-        // const { completeName, login, email, password, passwordConfirm } = this.state;
-        // if (!completeName || !login || !email || !password || !passwordConfirm) {
-        //     return false;
-        // }
-        // return this.validatePassword();
         return true
     }
 
@@ -212,13 +211,6 @@ class Aluno extends Component {
             toDeleteItem: null,
             toViewItem: null,
             toEditItem: null,
-            // completeName: '',
-            // login: '',
-            // email: '',
-            // password: '',
-            // passwordConfirm: '',
-            // checkboxChangePassword: true,
-            // checkboxNotifyEmail: true
         });
     }
 
@@ -306,7 +298,6 @@ class Aluno extends Component {
             // Lógica para lidar com a resposta da API
         })
         .catch(error => {
-            console.log(error)
             toast.error('Ocorreu um erro', {
                 position: "top-right",
                 autoClose: 3000,
@@ -323,8 +314,6 @@ class Aluno extends Component {
     
     delete = () => {
 
-        console.log(this.state.toDeleteItem)
-        
         const url = window.server + "/alunos/" + this.state.toDeleteItem.id;
 
         const token = sessionStorage.getItem('token');
@@ -369,7 +358,6 @@ class Aluno extends Component {
 
     beginDeletion = (alunos) => {
         this.setState({ toDeleteItem: alunos, showModalDeletion: true });
-        console.log(this.state.showModalDeletion)
 	}
 
     beginView = (aluno) => { 
@@ -400,6 +388,42 @@ class Aluno extends Component {
             });
     }
 
+    uploadFile = (event) => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('file', this.state.uploadAlunos);
+
+        this.alunoService.importFromFile(formData)
+            .then((response) => {
+                if(response.status === 200) {
+                    this.setState({ showModalUpload: false });
+                    toast.success('Arquivo carregado com sucesso! ' + response.data + " novo(s) registro(s) inserido(s).", {
+                        position: "top-right",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      });
+                    this.fillList();
+                } 
+            }).catch((error) => {
+                let errorMessage = 'Servidor indisponível';
+                if(error.response) {errorMessage = TranslationService.translate(error.response.data.message);}
+                toast.error('Erro ao carregar arquivo: ' + errorMessage, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+            });
+    }
+
     componentDidMount() {
         this.fillList();
     }
@@ -408,21 +432,32 @@ class Aluno extends Component {
         return (
         <div>
             <Navbar />
+            <ToastContainer />
 
             <div className='page-content'>
-                <h1 className='display-6 fw-bold text-decoration-underline p-3'>Alunos</h1>
+                <div className="col-12 mb-4 mt-4">
+                    <h1 className='display-5 fw-bold mb-4 tittle tittleAfter'>Alunos</h1>
+                </div>
                 
-                <ToastContainer />
 
-                <div className='col-12 col-md-3 ms-5'>
-                    <div className="card mx-3" style={{ maxWidth: '200px' }}>
+                <div className='col-sm-10 col-md-6 col-lg-5 col-xl-4 ms-5'>
+                    <div className="card mx-3" style={{ maxWidth: '500px' }}>
                         <div className="card-body">
                             <button 
                                 type="button" 
-                                className="btn btn-success fw-bold w-100" 
+                                className="btn btn-success fw-bold w-50 me-2" 
+                                style={{ width: '45%' }} 
                                 onClick={this.beginRegistration}
                             >
                                 <i className="bi bi-plus-circle-dotted fs-6 me-2"></i>Incluir
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-primary fw-bold"
+                                style={{ width: '45%' }} 
+                                onClick={this.beginUpload}
+                            >
+                                <i className="bi bi-cloud-upload"></i> Carregar arquivo
                             </button>
                         </div>
                     </div>
@@ -460,7 +495,7 @@ class Aluno extends Component {
 
             <div className='modals'>
                 <Modal show={this.state.showModalRegistration} onHide={() => this.closeModal('Registration')} centered>
-                    <Modal.Header closeButton className='bg-dark text-white'>
+                    <Modal.Header closeButton className='bg-dark text-white' closeVariant='white'>
                         <Modal.Title>Novo Aluno</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={this.registerForm}>
@@ -502,7 +537,7 @@ class Aluno extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalDeletion} onHide={() => this.closeModal('Deletion')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Confirmar Exclusão</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>Tem certeza que deseja excluir o aluno {this.state.toDeleteItem && <span className='fw-bold'>{this.state.toDeleteItem.nome}</span>}?</Modal.Body>
@@ -517,7 +552,7 @@ class Aluno extends Component {
                 </Modal>
 
                 <Modal show={this.state.showModalView} onHide={() => this.closeModal('View')} centered>
-                    <Modal.Header className='bg-dark text-white' closeButton>
+                    <Modal.Header className='bg-dark text-white' closeButton closeVariant='white'>
                     <Modal.Title>Aluno {this.state.toViewItem && <>{this.state.toViewItem.titulo}</>}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -581,6 +616,31 @@ class Aluno extends Component {
                             Fechar
                         </Button>
                         <button type='submit' className="btn btn-primary">Salvar</button>
+                    </Modal.Footer>
+                    </form>
+                </Modal>
+
+                <Modal show={this.state.showModalUpload} onHide={() => this.closeModal('Upload')} centered size='md'> 
+                    <Modal.Header closeButton className='bg-dark text-white' closeVariant='white'>
+                        <Modal.Title>Importação de Alunos</Modal.Title>
+                    </Modal.Header>
+                    <form onSubmit={this.uploadFile}>
+                    <Modal.Body>
+                            <div className="mb-3 row justify-content-center">  
+                                <div className='col-12'>
+                                    <label htmlFor="upload-alunos" className='form-label'>Carregue o arquivo</label>
+                                    <input type="file" id="upload-alunos" className='form-control' name="uploadAlunos" accept=".csv,.xls,.xlsx" required onChange={this.handleChange}></input>
+                                    <small className="form-text text-muted">Formatos aceitos: CSV, XLS, XLSX</small>
+                                </div>
+                            </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeModal('Upload')}>
+                            Cancelar
+                        </Button>
+                        <Button variant="success" type='submit' disabled={!this.state.uploadAlunos}>
+                            Carregar
+                        </Button>
                     </Modal.Footer>
                     </form>
                 </Modal>
